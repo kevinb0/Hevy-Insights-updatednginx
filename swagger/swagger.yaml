@@ -1,0 +1,633 @@
+openapi: "3.1.1"
+info:
+  title: Free Hevy API Docs
+  version: "1.0.0"
+  description: This Swagger documentation provides details about various Hevy API endpoints which can be retrieved without a Hevy PRO subscription.
+  contact:
+    name: casudo
+    email: hevy@kida.one
+    url: https://kida.one
+
+servers:
+  - url: https://api.hevyapp.com
+    description: Hevy API Server
+
+paths:
+  /validate_auth_token:
+    post:
+      summary: Validate Auth Token
+      description: Validate an authentication token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                authToken:
+                  type: string
+                  description: The authentication token to validate
+                  example: abc123
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  auth_token:
+                    type: string
+                    description: Returns the same token if valid
+                    example: "abc123"
+        "404":
+          description: if the token is invalid
+  /user/account:
+    get:
+      summary: Get User Account Information
+      description: Retrieve information about the authenticated user's account.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: API "string" (?) for authentication
+          example: klean_kanteen_insulated
+        - in: header
+          name: auth-token
+          required: true
+          schema:
+            type: string
+          description: Auth token for authentication
+          example: abc123
+      responses:
+        "200":
+          description: Full data for the authenticated user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The user's unique identifier
+                    example: 42cc153b-1242-452h-8bd2-12ew231f342
+                  username:
+                    type: string
+                    description: The user's email address
+                    example: hevyuser1
+                  email:
+                    type: string
+                    description: The user's email address
+                    example: hevyuser1@example.com
+                  full_name:
+                    type: string
+                    description: The user's full name
+                    example: John Doe
+                  description:
+                    type: string
+                    description: A brief description of the user
+                    example: Fitness enthusiast and app user
+                  profile_pic:
+                    type: string
+                    description: URL to the user's profile picture
+                    example: https://example.com/profile-pic.jpg
+                  is_strava_connected:
+                    type: boolean
+                    description: Indicates if the user has connected their Strava account
+                    example: true
+                  is_chatgpt_oauth_authorized:
+                    type: boolean
+                    description: Indicates if the user has authorized ChatGPT OAuth
+                    example: false
+                  country_code:
+                    type: string
+                    description: The user's country code
+                    example: US
+                  likes_push_enabled:
+                    type: boolean
+                    description: Indicates if push notifications are enabled
+                    example: true
+                  follows_push_enabled:
+                    type: boolean
+                    description: Indicates if follow notifications are enabled
+                    example: false
+                  comments_push_enabled:
+                    type: boolean
+                    description: Indicates if comment notifications are enabled
+                    example: true
+                  comment_mention_push_enabled:
+                    type: boolean
+                    description: Indicates if comment mention notifications are enabled
+                    example: true
+                  comment_discussion_push_enabled:
+                    type: boolean
+                    description: Indicates if comment discussion notifications are enabled
+                    example: false
+                  private_profile:
+                    type: boolean
+                    description: Indicates if the user's profile is private
+                    example: false
+                  created_at:
+                    type: string
+                    format: date-time
+                    description: The date and time when the user account was created
+                    example: "2023-08-16T12:19:24.616Z"
+                  last_workout_at:
+                    type: string
+                    format: date-time
+                    description: The date and time of the user's last workout
+                    example: "2024-06-10T09:30:00.000Z"
+                  accepted_terms_and_conditions:
+                    type: boolean
+                    description: Indicates if the user has accepted the terms and conditions
+                    example: true
+                  is_coached:
+                    type: boolean
+                    description: Indicates if the user is coached
+                    example: false
+                  is_a_coach:
+                    type: boolean
+                    description: Indicates if the user is a coach
+                    example: true
+                  sex:
+                    type: string
+                    description: The user's sex
+                    example: male
+                  birthday:
+                    type: string
+                    format: date
+                    description: The user's birthday
+                    example: "1990-05-15"
+                  email_consent:
+                    type: boolean
+                    description: Indicates if the user has given email consent
+                    example: true
+                  email_verified:
+                    type: boolean
+                    description: Indicates if the user's email is verified
+                    example: true
+                  is_hevy_trainer_user:
+                    type: boolean
+                    description: Indicates if the user is a Hevy trainer
+                    example: false
+        "401":
+          description: Unauthorized - Invalid or missing auth token
+          content:
+            application/text:
+              schema:
+                type: string
+                example: InvalidAuthToken
+  /user_workouts_paged:
+    get:
+      summary: Get User Workouts (Paged)
+      description: Retrieve a paginated list of workouts for the authenticated user.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: API "string" (?) for authentication
+          example: klean_kanteen_insulated
+        - in: header
+          name: auth-token
+          required: true
+          schema:
+            type: string
+          description: Auth token for authentication
+          example: abc123
+        - in: query
+          name: username
+          required: false
+          schema:
+            type: string
+          description: The username to retrieve workouts for
+          example: hevyuser1
+        - in: query
+          name: offset
+          required: false
+          schema:
+            type: integer
+          description: The last N workouts to show. Go in 5 steps (0, 5, 10, 15, ...)
+          example: 0
+      responses:
+        "200":
+          description: A list of user workouts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workouts:
+                    type: array
+                    description: Last 5 workouts on the current page
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: The unique identifier for the workout
+                          example: 14964e25-506e-4c4c-9f88-44c4529727
+                        name:
+                          type: string
+                          description: The name of the workout
+                          example: "Chest/Triceps Day"
+                        index:
+                          type: integer
+                          description: "???"
+                          example: 176351573
+                        media:
+                          type: array
+                          description: "TODO: Find example"
+                          example: []
+                        user_id:
+                          type: string
+                          description: The unique identifier of the user who performed the workout
+                          example: 42cc153b-1242-452h-8bd2-12ew231f342
+                        comments:
+                          type: array
+                          description: "TODO: Find example"
+                          example: []
+                        end_time:
+                          type: integer
+                          description: The end time of the workout
+                          example: 1760623342
+                        short_id:
+                          type: string
+                          description: The short identifier for the workout
+                          example: TfjW8HtcwHp
+                        username:
+                          type: string
+                          description: The username of the user who performed the workout
+                          example: hevyuser1
+                        verified:
+                          type: boolean
+                          description: "???"
+                          example: false
+                        exercises:
+                          type: array
+                          description: "Array/List of exercises performed in the workout"
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                description: The unique identifier for the exercise
+                                example: 940c3feb-03fe-40ec-b3c8-f3fe4f4cc422
+                              url:
+                                type: string
+                                description: Link to small gif/image of the exercise
+                                example: "https://pump-app.s3.eu-west-2.amazonaws.com/exercise-assets/06621201-Push-up-m_Chest.mp4"
+                              sets:
+                                type: array
+                                description: List of sets performed in the exercise
+                                items:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: integer
+                                      description: The unique identifier for the set
+                                      example: 3617353021
+                                    prs:
+                                      type: array
+                                      description: "TODO: Finx example"
+                                      example: []
+                                    rpe:
+                                      type: integer
+                                      description: RPE (Rate of Perceived Exertion) for the set
+                                      example: 8
+                                    reps:
+                                      type: integer
+                                      description: Number of repetitions in the set
+                                      example: 10
+                                    index:
+                                      type: integer
+                                      description: Nr. of the set in the exercise. Starts at 0. The 10th set gets index 9.
+                                      example: 0
+                                    indicator:
+                                      type: string
+                                      description: "TODO: Find example"
+                                      example: normal
+                                    weight_kg:
+                                      type: number
+                                      description: Weight used in the set (in kilograms)
+                                      example: 63.5
+                                    completed_at:
+                                      type: string
+                                      format: date-time
+                                      description: date-time when the set was completed
+                                      example: "2025-12-09T14:37:48.915Z"
+                                    custom_metric:
+                                      type: string
+                                      description: "TODO: Find example"
+                                      example: null
+                                    distance_meters:
+                                      type: string
+                                      description: "TODO: Find example"
+                                      example: null
+                                    personalRecords:
+                                      type: array
+                                      description: "TODO: Find example"
+                                      example: []
+                                    duration_seconds:
+                                      type: string
+                                      description: "TODO: Find example"
+                                      example: null
+                              notes:
+                                type: string
+                                description: Notes for the exercise
+                                example: "Felt strong today!"
+                              title:
+                                type: string
+                                description: English title of the exercise
+                                example: Deadlift (Barbell)
+                              de_title:
+                                type: string
+                                description: German title of the exercise
+                                example: Kreuzheben (Langhantel)
+                              es_title:
+                                type: string
+                                description: Spanish title of the exercise
+                                example: Peso muerto (Barra)
+                              fr_title:
+                                type: string        
+                                description: French title of the exercise
+                                example: Soulevé de terre (Barre)
+                              it_title:
+                                type: string
+                                description: Italian title of the exercise
+                                example: Stacco da terra (Barra)
+                              ja_title:
+                                type: string
+                                description: Japanese title of the exercise
+                                example: デッドリフト（バーベル）
+                              ko_title:
+                                type: string
+                                description: Korean title of the exercise
+                                example: 데드리프트(바벨)
+                              priority:
+                                type: integer
+                                description: "???"
+                                example: 10
+                              pt_title:
+                                type: string
+                                description: Portuguese title of the exercise
+                                example: Levantamento terra (Barra)
+                              ru_title:
+                                type: string
+                                description: Russian title of the exercise
+                                example: Становая тяга (штанга)
+                              tr_title:
+                                type: string
+                                description: Turkish title of the exercise
+                                example: Deadlift (Bar)
+                              media_type:
+                                type: string
+                                description: Type of media for the exercise
+                                example: video
+                              superset_id:
+                                type: string
+                                description: "TODO: Find example"
+                                example: null
+                              zh_cn_title:
+                                type: string
+                                description: Chinese (Simplified) title of the exercise
+                                example: 硬拉（杠铃）
+                              zh_tw_title:
+                                type: string
+                                description: Chinese (Traditional) title of the exercise
+                                example: 硬舉（槓鈴）
+                              muscle_group:
+                                type: string
+                                description: Primary muscle group targeted by the exercise
+                                example: glutes
+                              rest_seconds:
+                                type: integer
+                                description: Rest time between sets (in seconds)
+                                example: 100
+                              exercise_type:
+                                type: string
+                                description: Type of exercise
+                                example: weight_reps
+                              other_muscle_groups:
+                                type: array
+                                description: Additional muscle groups targeted by the exercise
+                                example:
+                                  - hamstrings
+                                  - quadriceps
+                                  - lower_back
+                                  - upper_back
+                                  - lats
+                                  - traps
+                              thumbnail_url:
+                                type: string
+                                description: URL to the thumbnail image of the exercise
+                                example: "https://pump-app.s3.eu-west-2.amazonaws.com/exercise-thumbnails/00321201-Barbell-Deadlift_Hips-FIX_thumbnail@3x.jpg"
+                              equipment_category:
+                                type: string
+                                description: Category of equipment used for the exercise
+                                example: barbell
+                              exercise_template_id:
+                                type: string
+                                description: The unique identifier for the exercise template
+                                example: C6272009
+                              volume_doubling_enabled:
+                                type: boolean
+                                description: Indicates if volume doubling is enabled for the exercise
+                                example: false
+                              custom_exercise_image_url:
+                                type: string
+                                description: URL to the custom image for the exercise
+                                example: null
+                        biometrics:
+                          type: array
+                          description: Apple Watch data
+                          items:
+                            type: object
+                            properties:
+                              total_calories:
+                                type: integer
+                                description: Total calories burned
+                                example: 250
+                              average_heart_rate:
+                                type: integer
+                                description: Average heart rate during the workout
+                                example: 120
+                              heart_rate_samples:
+                                type: array
+                                description: List of heart rate samples
+                                items:
+                                  type: object
+                                  properties:
+                                    bpm:
+                                      type: integer
+                                      description: BPM of the reading
+                                      example: 75
+                                    timestamp_ms:
+                                      type: integer
+                                      description: Timestamp of the reading in milliseconds
+                                      example: 1765294086000
+                        created_at:
+                          type: string
+                          format: date-time
+                          description: The date and time when the workout was created
+                          example: "2024-06-10T08:30:00.000Z"
+                        image_urls:
+                          type: array
+                          description: "TODO: Find example"
+                          example: []   
+                        is_private:
+                          type: boolean
+                          description: Indicates if the workout is private
+                          example: false
+                        like_count:
+                          type: integer
+                          description: Number of likes on the workout
+                          example: 1
+                        routine_id:
+                          type: string
+                          description: The unique identifier for the routine
+                          example: b4d1fabe-a453-4cdf-8111-23cc21757592   
+                        start_time:
+                          type: integer
+                          description: The start time of the workout
+                          example: 1765289016
+                        updated_at:
+                          type: string
+                          format: date-time
+                          description: The date and time when the workout was last updated
+                          example: "2024-06-10T09:45:00.000Z"
+                        apple_watch:
+                          type: boolean
+                          description: Indicates if the workout was recorded using an Apple Watch
+                          example: true
+                        description:
+                          type: string
+                          description: "TODO: Find example"
+                        like_images:
+                          type: array
+                          description: Profile pictures of users who liked the workout
+                          example: []
+                        nth_workout:
+                          type: integer
+                          description: The sequential number of the workout for the user
+                          example: 42
+                        wearos_watch:
+                          type: boolean
+                          description: Indicates if the workout was recorded using a Wear OS watch
+                          example: false
+                        comment_count:
+                          type: integer
+                          description: Number of comments on the workout
+                          example: 0
+                        profile_image:
+                          type: string
+                          description: URL to the profile image of the user who performed the workout
+                          example: https://example.com/profile-pic.jpg
+                        estimated_volume_kg:
+                          type: integer
+                          description: Estimated volume lifted during the workout (in kilograms)
+                          example: 14746
+                        include_warmup_sets:
+                          type: boolean
+                          description: Indicates if warmup sets are included in the workout data
+                          example: true
+                        is_biometrics_public:
+                          type: boolean
+                          description: Indicates if the biometrics data is public
+                          example: true
+                        preview_workout_likes:
+                          type: array
+                          description: "TODO: Find example"
+                          example: []
+                        is_liked_by_user:
+                          type: boolean
+                          description: Indicates if the workout is liked by the authenticated user
+                          example: false
+        "401":
+          description: Unauthorized - Invalid or missing auth token
+          content:
+            application/text:
+              schema:
+                type: string
+                example: InvalidAuthToken
+  /login:
+    post:
+      summary: User Login
+      description: Authenticate a user and retrieve an authentication token.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: API "string" (?) for authentication
+          example: klean_kanteen_insulated
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                emailOrUsername:
+                  type: string
+                  description: The user's username or email address
+                  example: hevyuser1
+                password:
+                  type: string
+                  description: The user's password
+                  example: securepassword123
+                useAuth2_0:
+                  type: boolean
+                  description: Flag to indicate if OAuth 2.0 should be used
+                  example: true
+      responses:
+        "200":
+          description: Successful authentication
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  auth_token:
+                    type: string
+                    description: The authentication token for the user
+                    example: 77c9a26-f21e-24d5-a292-6152796ef2cd
+                  user_id:
+                    type: string
+                    description: The unique identifier for the authenticated user
+                    example: 42cc153b-1242-452h-8bd2-12ew231f342
+                  access_token:
+                    type: string
+                    description: OAuth 2.0 access token
+                    example: 5GTXCgzIDwauhODIWvK+0awdwaDwe+fGmMmEi
+                  refresh_token:
+                    type: string
+                    description: OAuth 2.0 refresh token
+                    example: c+04Rk25MKd3HK7ERDESK8suTPhwdhWAUDAIWDAOPWIDAWIjvNesfsfs4
+                  expires_at:
+                    type: string
+                    format: date-time
+                    description: Expiration date and time of the access token
+                    example: "2024-12-31T23:59:59.000Z"                
+        "401":
+          description: Unauthorized - Invalid username or password
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: InvalidEmailOrPassword
+        "403":
+          description: "Actually 401: Unauthorized - OAuth 2.0 required (no x-api-key in headers)"
+          content:
+            application/text:
+              schema:
+                type: string
+                example: Unauthorized
