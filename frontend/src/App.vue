@@ -45,9 +45,12 @@ router.afterEach(() => {
           <span class="nav-text">Dashboard</span>
         </router-link>
         <router-link to="/workouts-card" class="nav-item">
-          <span class="nav-text">Workouts (Card)</span>
           <span class="nav-icon">🏋️</span>
-          <span class="nav-text">Workouts</span>
+          <span class="nav-text">Workouts (Card)</span>
+        </router-link>
+        <router-link to="/workouts-list" class="nav-item">
+          <span class="nav-icon">🏋️</span>
+          <span class="nav-text">Workouts (List)</span>
         </router-link>
       </nav>
 
