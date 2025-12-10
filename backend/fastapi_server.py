@@ -21,8 +21,7 @@ app = FastAPI(
     title="Hevy Insights API",
     description="Backend API for Hevy Insights",
     version="1.0.0",
-    docs_url="/api/docs",
-    redoc_url="/api/redoc"
+    docs_url="/api/docs", # Swagger
 )
 app.add_middleware(
     CORSMiddleware,
