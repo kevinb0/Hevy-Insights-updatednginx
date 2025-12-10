@@ -58,6 +58,8 @@ const workoutIndex = (workoutId: string) => {
 
 const nextPage = () => { if (hasMore.value) currentPage.value++; };
 const prevPage = () => { if (hasPrev.value) currentPage.value--; };
+const firstPage = () => { currentPage.value = 1; };
+const lastPage = () => { currentPage.value = totalPages.value; };
 
 const formatDate = (timestamp: number) => new Date(timestamp * 1000).toLocaleString();
 const formatDuration = (start: number, end: number) => `${Math.floor((end - start) / 60)} min`;
@@ -105,9 +107,11 @@ onMounted(async () => {
     <div v-else>
       <!-- Top pagination -->
       <div class="pagination top">
+        <button @click="firstPage" :disabled="!hasPrev" class="pagination-btn">《 First</button>
         <button @click="prevPage" :disabled="!hasPrev" class="pagination-btn">← Previous</button>
         <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
         <button @click="nextPage" :disabled="!hasMore" class="pagination-btn">Next →</button>
+        <button @click="lastPage" :disabled="!hasMore" class="pagination-btn">Last 》</button>
       </div>
 
       <div class="grid">
@@ -169,9 +173,11 @@ onMounted(async () => {
 
       <!-- Bottom pagination -->
       <div class="pagination bottom">
+        <button @click="firstPage" :disabled="!hasPrev" class="pagination-btn">《 First</button>
         <button @click="prevPage" :disabled="!hasPrev" class="pagination-btn">← Previous</button>
         <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
         <button @click="nextPage" :disabled="!hasMore" class="pagination-btn">Next →</button>
+        <button @click="lastPage" :disabled="!hasMore" class="pagination-btn">Last 》</button>
       </div>
     </div>
   
