@@ -116,10 +116,7 @@ const weeks = computed(() => {
 });
 
 const cellColor = (count: number) => {
-  if (count === 0) return "var(--bg-secondary)";
-  if (count === 1) return "#c6f6d5"; // light green
-  if (count <= 3) return "#68d391"; // medium
-  return "#2f855a"; // dark
+  return count > 0 ? "#68d391" : "var(--bg-secondary)"; // single color for days with workouts
 };
 
 const scrollToDay = async (day: string) => {
@@ -165,17 +162,16 @@ onMounted(async () => { await store.fetchWorkouts(); });
         <span v-for="(col, ci) in weeks" :key="'m-' + ci" class="month-label">{{ col.monthLabel || '' }}</span>
       </div>
       <div class="grid">
-        <div v-for="(col, ci) in weeks" :key="'c-' + ci" class="week-col">
-          <div v-for="day in col.days" :key="day.date" class="cell" :style="{ backgroundColor: cellColor(day.count) }" @click="scrollToDay(day.date)" :title="`${day.date} — ${day.count} workout(s)`"></div>
+        <div class="weekday-col">
+          <span v-for="label in ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']" :key="label" class="weekday">{{ label }}</span>
+        </div>
+        <div class="weeks-wrap">
+          <div v-for="(col, ci) in weeks" :key="'c-' + ci" class="week-col">
+            <div v-for="day in col.days" :key="day.date" class="cell" :style="{ backgroundColor: cellColor(day.count) }" @click="scrollToDay(day.date)" :title="`${day.date} — ${day.count} workout(s)`"></div>
+          </div>
         </div>
       </div>
-      <div class="legend">
-        <span>Less</span>
-        <span class="legend-swatch" :style="{ backgroundColor: cellColor(1) }"></span>
-        <span class="legend-swatch" :style="{ backgroundColor: cellColor(2) }"></span>
-        <span class="legend-swatch" :style="{ backgroundColor: cellColor(4) }"></span>
-        <span>More</span>
-      </div>
+      
     </div>
 
     <!-- Loading state -->
@@ -273,11 +269,13 @@ h1 { margin: 0; color: var(--text-primary); font-size: 2rem; font-weight: 600; l
 .contrib-graph { margin-bottom: 1.5rem; }
 .contrib-graph .month-row { display: flex; gap: 3px; margin-bottom: 4px; }
 .contrib-graph .month-label { display: inline-block; width: 12px; font-size: 0.7rem; color: var(--text-secondary); text-align: center; }
-.contrib-graph .grid { display: flex; gap: 3px; }
+.contrib-graph .grid { display: flex; gap: 6px; align-items: flex-start; }
+.contrib-graph .weekday-col { display: flex; flex-direction: column; gap: 3px; }
+.contrib-graph .weekday { width: 28px; font-size: 0.7rem; color: var(--text-secondary); text-align: right; line-height: 12px; }
+.contrib-graph .weeks-wrap { display: flex; gap: 3px; }
 .contrib-graph .week-col { display: flex; flex-direction: column; gap: 3px; }
 .contrib-graph .cell { width: 12px; height: 12px; border-radius: 2px; cursor: pointer; border: 1px solid var(--border-color); }
-.contrib-graph .legend { display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary); margin-top: 0.5rem; }
-.contrib-graph .legend-swatch { width: 14px; height: 14px; border-radius: 2px; display: inline-block; border: 1px solid var(--border-color); }
+
 
 .loading-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem; gap: 1rem; }
 .loading-spinner { width: 48px; height: 48px; border: 4px solid rgba(16,185,129,0.25); border-top-color: var(--emerald-primary); border-radius: 50%; animation: spin 0.9s linear infinite; }
