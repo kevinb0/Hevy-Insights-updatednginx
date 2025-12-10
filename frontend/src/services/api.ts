@@ -52,7 +52,7 @@ export const userService = {
 
 // Workout Service
 export const workoutService = {
-  async getWorkouts(username?: string, offset: number = 0) {
+  async getWorkouts(username: string, offset: number = 0) {
     const response = await api.get("/workouts", {
       params: { username, offset },
     });
