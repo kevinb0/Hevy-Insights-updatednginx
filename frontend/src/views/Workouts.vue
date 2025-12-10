@@ -64,6 +64,28 @@ const lastPage = () => { currentPage.value = totalPages.value; };
 const formatDate = (timestamp: number) => new Date(timestamp * 1000).toLocaleString();
 const formatDuration = (start: number, end: number) => `${Math.floor((end - start) / 60)} min`;
 
+// Helpers for additional stats
+const totalSets = (workout: any) => {
+  return (workout.exercises || []).reduce((sum: number, ex: any) => sum + ((ex.sets || []).length), 0);
+};
+// Biometrics from Hevy API payload
+const biometrics = (workout: any) => {
+  const bio = workout?.biometrics;
+  if (!bio || typeof bio !== "object") return null;
+  const hasData = typeof bio.total_calories === "number" || typeof bio.average_heart_rate === "number";
+  return hasData ? bio : null;
+};
+const bpmDisplay = (workout: any) => {
+  const bio = biometrics(workout);
+  const bpm = bio?.average_heart_rate;
+  return typeof bpm === "number" ? `${Math.round(bpm)} bpm` : null;
+};
+const caloriesDisplay = (workout: any) => {
+  const bio = biometrics(workout);
+  const cal = bio?.total_calories;
+  return typeof cal === "number" ? `${Math.round(cal)} kcal` : null;
+};
+
 const toggleExercise = (exerciseId: string) => {
   expandedExercises.value[exerciseId] = !expandedExercises.value[exerciseId];
 };
@@ -123,7 +145,11 @@ onMounted(async () => {
               <span class="index-pill">#{{ workoutIndex(workout.id) }}</span>
               <h2>{{ workout.name || "Unnamed Workout" }}</h2>
             </div>
-            <span class="date">{{ formatDate(workout.start_time) }}</span>
+            <div class="header-meta">
+              <span class="date">{{ formatDate(workout.start_time) }}</span>
+              <span v-if="bpmDisplay(workout)" class="pill pill-red" title="Average Heart Rate">❤️ {{ bpmDisplay(workout) }}</span>
+              <span v-if="caloriesDisplay(workout)" class="pill pill-orange" title="Total Calories">🔥 {{ caloriesDisplay(workout) }}</span>
+            </div>
           </div>
 
           <!--  Middle Row with Stats  -->
@@ -131,6 +157,7 @@ onMounted(async () => {
             <div class="stat"><strong>{{ workout.estimated_volume_kg?.toLocaleString() || 0 }} kg</strong><span>Volume</span></div>
             <div class="stat"><strong>{{ formatDuration(workout.start_time, workout.end_time) }}</strong><span>Duration</span></div>
             <div class="stat"><strong>{{ workout.exercises?.length || 0 }}</strong><span>Exercises</span></div>
+            <div class="stat"><strong>{{ totalSets(workout) }}</strong><span>Total Sets</span></div>
           </div>
 
           <!--  Exercises List  -->
@@ -207,7 +234,11 @@ onMounted(async () => {
   .title-row { display: flex; align-items: center; gap: 0.5rem; }
   .index-pill { display: inline-block; background: rgba(16,185,129,0.15); color: var(--emerald-primary); border: 1px solid rgba(16,185,129,0.3); border-radius: 999px; padding: 0.15rem 0.5rem; font-size: 0.8rem; font-weight: 600; }
   .card-header h2 { margin: 0; color: var(--text-primary); font-size: 1.125rem; font-weight: 600; }
+  .header-meta { display: flex; align-items: center; gap: 0.5rem; }
   .date { color: var(--text-secondary); font-size: 0.85rem; }
+  .pill { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; border: 1px solid transparent; }
+  .pill-red { background: rgba(239, 68, 68, 0.15); color: #ef4444; border-color: rgba(239, 68, 68, 0.35); }
+  .pill-orange { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border-color: rgba(245, 158, 11, 0.35); }
 
   .stats-row { display: flex; gap: 1.25rem; margin-bottom: 1rem; }
   .stat { display: flex; flex-direction: column; gap: 0.15rem; }
