@@ -34,6 +34,14 @@ const router = createRouter({
       component: WorkoutsList,
       meta: { requiresAuth: true },
     },
+    // Catch-all for unknown paths
+    {
+      path: "/:pathMatch(.*)*",
+      name: "NotFoundRedirect",
+      // We'll redirect based on auth in the global guard
+      component: Dashboard,
+      meta: { requiresAuth: true },
+    },
   ],
 });
 
@@ -42,12 +50,20 @@ router.beforeEach((to, _from, next) => {
   const token = localStorage.getItem("hevy_auth_token");
   
   if (to.meta.requiresAuth && !token) {
-    next("/login");
-  } else if (to.path === "/login" && token) {
-    next("/dashboard");
-  } else {
-    next();
+    return next("/login");
   }
+
+  if (to.path === "/login" && token) {
+    return next("/dashboard");
+  }
+
+  // If route is unmatched (catch-all), send to dashboard or login
+  const isCatchAll = to.name === "NotFoundRedirect";
+  if (isCatchAll) {
+    return next(token ? "/dashboard" : "/login");
+  }
+
+  return next();
 });
 
 export default router;
