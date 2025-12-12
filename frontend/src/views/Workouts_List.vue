@@ -189,9 +189,10 @@ onMounted(async () => { await store.fetchWorkouts(); });
       <h1>Workout History (List)</h1>
     </div>
 
-    <!-- Contribution Graph -->
+    <!-- Top Row -->
     <div class="contrib-graph">
       <div class="graph-and-filters">
+        <!-- Contribution Graph (hidden on mobile via CSS) -->
         <div class="graph-area">
           <div class="month-row">
             <span v-for="(col, ci) in weeks" :key="'m-' + ci" class="month-label">{{ col.monthLabel || '' }}</span>
@@ -207,6 +208,7 @@ onMounted(async () => { await store.fetchWorkouts(); });
             </div>
           </div>
         </div>
+        <!-- Filters -->
         <div class="filters">
           <label class="filter-label">Time Range</label>
           <select class="filter-select" :value="filterRange" @change="onChangeFilter(($event.target as HTMLSelectElement).value as any)">

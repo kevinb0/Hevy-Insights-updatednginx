@@ -20,7 +20,7 @@ const logout = () => {
   router.push("/login");
 };
 
-// Check auth status on mount to DOM (Document Object Model)
+// On mount to DOM (Document Object Model)
 onMounted(() => {
   updateNavVisibility();
   let lastY = window.scrollY;
