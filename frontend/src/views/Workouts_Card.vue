@@ -251,7 +251,8 @@ onMounted(async () => {
   @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   .loading-container p { color: var(--text-secondary); font-size: 1.1rem; }
 
-  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+  .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+  .card { min-width: 0; display: flex; flex-direction: column; }
   .card { background: var(--bg-card); padding: 1rem; border-radius: 12px; box-shadow: 0 4px 15px var(--shadow); border: 1px solid var(--border-color); transition: all 0.3s ease; }
   .card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px var(--shadow); border-color: var(--emerald-primary); }
 
