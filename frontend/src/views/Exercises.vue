@@ -100,7 +100,10 @@ const exercises = computed(() => {
     }
     // Calculate avg volume per set for each day
     for (const day of Object.keys(byDay)) {
-      byDay[day].avgVolumePerSet = byDay[day].setCount > 0 ? byDay[day].volume / byDay[day].setCount : 0;
+      const dayData = byDay[day];
+      if (dayData) {
+        dayData.avgVolumePerSet = dayData.setCount > 0 ? dayData.volume / dayData.setCount : 0;
+      }
     }
     ex.byDay = byDay;
     // Total sessions (sessions = days trained)
@@ -109,9 +112,11 @@ const exercises = computed(() => {
     let wMax = 0, rMax = 0, vMax = 0;
     for (const d of Object.keys(byDay)) {
       const v = byDay[d];
-      wMax = Math.max(wMax, v.maxWeight);
-      rMax = Math.max(rMax, v.repsAtMax);
-      vMax = Math.max(vMax, v.volume);
+      if (v) {
+        wMax = Math.max(wMax, v.maxWeight);
+        rMax = Math.max(rMax, v.repsAtMax);
+        vMax = Math.max(vMax, v.volume);
+      }
     }
     // top 3 best sets by weight across ALL workouts
     ex.topSets = [...ex.sets].sort((a,b) => (Number(b.weight)||0) - (Number(a.weight)||0)).slice(0,3);
