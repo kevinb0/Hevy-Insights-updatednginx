@@ -62,7 +62,6 @@ const exercises = computed(() => {
         video_url: ex.url || null,
         sets: [] as any[],
         prs: [] as any[],
-        domId: id,
       });
       for (const s of (ex.sets || [])) {
         const weight = Number((s as any).weight_kg ?? (s as any).weight ?? 0);
@@ -94,6 +93,9 @@ const exercises = computed(() => {
       if ((Number(s.weight) || 0) > cur.maxWeight) {
         cur.maxWeight = Number(s.weight) || 0;
         cur.repsAtMax = Number(s.reps) || 0;
+      } else if ((Number(s.weight) || 0) === cur.maxWeight) {
+        // If same max weight, keep the highest reps
+        cur.repsAtMax = Math.max(cur.repsAtMax, Number(s.reps) || 0);
       }
     }
     // Calculate avg volume per set for each day
@@ -111,7 +113,6 @@ const exercises = computed(() => {
       rMax = Math.max(rMax, v.repsAtMax);
       vMax = Math.max(vMax, v.volume);
     }
-    ex.maxes = { weight: wMax, reps: rMax, volume: vMax };
     // top 3 best sets by weight across ALL workouts
     ex.topSets = [...ex.sets].sort((a,b) => (Number(b.weight)||0) - (Number(a.weight)||0)).slice(0,3);
     // distinct PRs - keep only the best value for each PR type
@@ -469,8 +470,6 @@ const barChartOptions = {
               </div>
             </div>
           </div>
-
-          <!-- Top sets table kept inline next to image above -->
         </div>
       </div>
     </div>
@@ -516,18 +515,6 @@ const barChartOptions = {
 .graph h3 { margin: 0 0 0.5rem; font-size: 1rem; color: var(--text-primary); }
 .graph-grid { border: 1px solid var(--border-color); border-radius: 8px; padding: 0.75rem; background: var(--bg-secondary); }
 .chart-container { height: 220px; }
-.graph-row { display: flex; gap: 1rem; margin-bottom: 0.5rem; }
-.legend { font-size: 0.85rem; color: var(--text-secondary); }
-.legend.weight { color: #93c5fd; }
-.legend.reps { color: #fca5a5; }
-.legend.volume { color: #34d399; }
-.bars { display: flex; gap: 6px; align-items: flex-end; height: 160px; }
-.bar-group { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.bar { width: 16px; border-radius: 3px; }
-.bar.weight { background: #60a5fa; }
-.bar.reps { background: #f87171; }
-.bar.volume { background: #10b981; }
-.bar-label { color: var(--text-secondary); font-size: 0.7rem; }
 
 .top-sets h3 { margin: 0 0 0.5rem 0; font-size: 1rem; color: var(--text-primary); }
 .sets-table { width: 100%; border-collapse: collapse; }
