@@ -84,6 +84,10 @@ watch(isMobileSidebarOpen, (open) => {
           <span class="nav-icon">🏋️</span>
           <span class="nav-text">Workouts (List)</span>
         </router-link>
+        <router-link to="/exercises" class="nav-item">
+          <span class="nav-icon">📚</span>
+          <span class="nav-text">Exercises</span>
+        </router-link>
       </nav>
 
       <div class="sidebar-footer">
