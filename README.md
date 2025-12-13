@@ -37,7 +37,7 @@ Hevy Insights allows you to log in with your Hevy credentials and fetch your wor
   - [High-Level-Flow](#high-level-flow)
     - [Authentication Flow](#authentication-flow)
   - [API in Dev vs Prod](#api-in-dev-vs-prod)
-    - [When `nginx.conf` is used](#when-nginxconf-is-used)
+    - [When nginx.conf is used](#when-nginxconf-is-used)
     - [Direct-to-Backend with CORS](#direct-to-backend-with-cors)
 - [Development](#development)
   - [Swagger Documentation](#swagger-documentation)
@@ -76,6 +76,7 @@ You can either use Hevy Insights online or run it locally on your machine.
 ## Hosted Online
 
 Navigate to the hosted version of Hevy Insights at: [https://hevy.kida.one](https://hevy.kida.one)
+
 The latest version is always hosted there.
 
 > [!IMPORTANT]
@@ -211,7 +212,7 @@ hevy-insights/
 - In production, the Axios base URL is `/api` (same origin). Requests resolve as `https://your-domain/api/...` and are reverse‑proxied to the backend by Nginx.
 - The `import.meta.env.PROD` flag is set automatically by Vite at build time. No extra configuration is required.
 
-### When `nginx.conf` is used
+### When nginx.conf is used
 
 - The file [frontend/nginx.conf](frontend/nginx.conf) is used when the built frontend is served by Nginx (e.g. on a server with Nginx).
 - It performs two critical roles:
