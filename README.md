@@ -105,9 +105,7 @@ Clone/download the repository and follow these steps:
 # Future Goals
 
 - Display time on Workout cards like "1h 15m" instead of "75 minutes"
-- Limit Workout cards grid to 3 rows x 2 columns instead of 3x3
 - Translations for other languages
-- Public Swagger docs for Hevy API endpoints
 - Settings page where the user can select translations and other preferences (date format, theme, etc.)
 - Better logging
 
@@ -116,7 +114,7 @@ Clone/download the repository and follow these steps:
 # Technical Documentation
 
 > [!NOTE]
-> As of 11.12.2025, **v1.0.0**
+> As of 13.12.2025, **v1.1.0**
 
 ## Project Structure
 
@@ -137,6 +135,7 @@ hevy-insights/
     │   │   └── hevy_cache.ts  # Hevy data caching
     │   ├── views/             # Page components (Login, Dashboard, Workouts)
     │   │   ├── Dashboard.vue  # Dashboard page
+    │   │   ├── Exercises.vue  # Exercises page
     │   │   ├── Login.vue      # Login page
     │   │   ├── Workouts_Card.vue   # Workouts page (card design)
     │   │   └── Workouts_List.vue   # Workouts page (list design)
@@ -144,6 +143,7 @@ hevy-insights/
     │   ├── main.ts            # Vue app entry point
     │   └── style.css          # Global styles
     ├── index.html             # HTML entry point
+    ├── nginx.conf             # Nginx configuration for production
     ├── package-lock.json      # npm package lock file
     ├── package.json           # Node.js dependencies
     ├── tsconfig.app.json      # TypeScript configuration for the app
@@ -166,6 +166,7 @@ hevy-insights/
 - **`src/services/api.ts`**: Centralized API communication layer using Axios with automatic auth token injection against the Hevy Insights API backend.
 - **`src/stores/hevy_cache.ts`**: Pinia store for caching Hevy API data with a 5-minute TTL.
 - **`src/views/Dashboard.vue`**: Main dashboard with Chart.js visualizations (volume over time, muscle group distribution) and workout metrics.
+- **`src/views/Exercises.vue`**: Exercises page with video thumbnails and detailed exercise stats.
 - **`src/views/Login.vue`**: Login page with form for Hevy credentials, stores auth token in localStorage.
 - **`src/views/Workouts_Card.vue`**: Paginated workout history browser with detailed exercise information (sets, reps, weight, RPE).
 - **`src/views/Workouts_List.vue`**: Alternative workout history browser in list design.
@@ -194,6 +195,7 @@ hevy-insights/
    - **Dashboard.vue**: Displays various statistics and charts about the user's workouts.
    - **Workouts_Card.vue**: Paginated card view of workouts with stats, description, per-exercise details (sets, reps, weight, RPE) and PR summaries on expanded exercises.
    - **Workouts_List.vue**: Alternative expandable list view with of the user's workouts.
+   - **Exercises.vue**: Shows a list of exercises with video thumbnails and stats.
 - **Pinia Store** (*frontend/src/stores/hevy_cache.ts*): Centralized state with 5‑minute caching for workouts (`workoutsLastFetched`). Exposes actions `fetchUserAccount()`, `fetchWorkouts(force)` and getters like `username`, `hasWorkouts`. Prevents redundant API calls when navigating.
 - **Axios Service** (*frontend/src/services/api.ts*): Configures base URL and injects the `auth-token` header via interceptors. All frontend API calls to the backend go through these typed helpers.
 - **Backend** (FastAPI): Serves `/api` endpoints. Validates `auth-token` and proxies requests to the official Hevy API. Frontend receives JSON responses and Vue reactivity updates the UI.
