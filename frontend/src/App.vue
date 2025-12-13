@@ -6,7 +6,7 @@ import { authService } from "./services/api";
 const router = useRouter();
 const route = useRoute();
 const showNav = ref(false);
-const appVersion = "v1.0.1"; // Update version as needed
+const appVersion = "v1.1.0"; // Update version as needed
 const isMobileSidebarOpen = ref(false);
 const showTopbar = ref(true);
 const showScrollTop = ref(false);
