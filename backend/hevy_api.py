@@ -4,11 +4,14 @@ import requests
 import logging
 from dataclasses import dataclass
 from typing import Optional
+from os import getenv
+from dotenv import load_dotenv
 
 ### ============================================================================
 
-### Data classes to replace passing many parameters around
+load_dotenv()  # Load environment variables from .env file
 
+### Data classes to replace passing many parameters around
 
 @dataclass
 class HevyUser:
@@ -25,7 +28,7 @@ class HevyConfig:
 
     def __init__(self):
         self.base_url = "https://api.hevyapp.com"
-        self.x_api_key = "klean_kanteen_insulated"  # Static for all users (free API)
+        self.X_API_KEY = getenv("X_API_KEY")  # Static for all users (free API)
 
     @property
     def login_url(self) -> str:
@@ -59,7 +62,7 @@ class HevyClient:
     def _update_headers(self) -> None:
         """Update session headers with current auth token."""
         self.session.headers.update({
-            "x-api-key": self.config.x_api_key,
+            "x-api-key": self.config.X_API_KEY,
             "auth-token": self.auth_token,
             "Content-Type": "application/json",
         })
@@ -80,7 +83,7 @@ class HevyClient:
         """
         logging.debug(f"Attempting login for user: {email_or_username}")
 
-        headers = {"x-api-key": self.config.x_api_key, "Content-Type": "application/json"}
+        headers = {"x-api-key": self.config.X_API_KEY, "Content-Type": "application/json"}
 
         body = {"emailOrUsername": email_or_username, "password": password, "useAuth2_0": True}
 
