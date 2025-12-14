@@ -5,6 +5,9 @@ from typing import Optional
 from hevy_api import HevyClient, HevyError
 from dotenv import load_dotenv
 import logging
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 ### ===============================================================================
 
@@ -17,9 +20,14 @@ load_dotenv()
 app = FastAPI(
     title="Hevy Insights API",
     description="Backend API for Hevy Insights",
-    version="1.0.1",
+    version="1.1.0",
     docs_url="/api/docs",  # Swagger
 )
+### Initialize rate limiter
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],  # Vue dev server
@@ -79,14 +87,14 @@ def get_auth_token(auth_token: Optional[str]) -> str:
 
 
 @app.post("/api/login", response_model=LoginResponse, tags=["Authentication"])
-async def login(credentials: LoginRequest):
+@limiter.limit("5/minute")  # Max 5 login attempts per minute per IP
     """
     Login with Hevy credentials to obtain an authentication token.
 
     - **emailOrUsername**: Your Hevy username or email
     - **password**: Your Hevy password
 
-    Returns auth token.
+    Returns auth token. Rate limited to 5 attempts per minute.
     """
     try:
         client = HevyClient()
