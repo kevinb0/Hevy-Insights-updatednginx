@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import { useHevyCache } from "../stores/hevy_cache";
-import { Line, Doughnut } from "vue-chartjs";
+import { Line, Doughnut, Radar } from "vue-chartjs";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -9,6 +9,7 @@ import {
   PointElement,
   LineElement,
   ArcElement,
+  RadialLinearScale,
   Title,
   Tooltip,
   Legend,
@@ -20,6 +21,7 @@ ChartJS.register(
   PointElement,
   LineElement,
   ArcElement,
+  RadialLinearScale,
   Title,
   Tooltip,
   Legend
@@ -413,10 +415,35 @@ onMounted(fetchData);
           </div>
         </div>
 
+        <!-- Weekly Rhythm Radar Chart -->
         <div class="chart-container">
           <div class="chart-header">
-            <h2>Muscle Distribution</h2>
-            <span class="chart-subtitle">Total sets by muscle group</span>
+            <div class="chart-title-section">
+              <h2>🔥 Weekly Rhythm</h2>
+              <span class="chart-subtitle">Training frequency by day</span>
+            </div>
+          </div>
+          <div class="chart-body radar-body">
+            <Radar 
+              :data="{ 
+                labels: weeklyRhythmData.labels, 
+                datasets: [{ 
+                  label: 'Workouts', 
+                  data: weeklyRhythmData.data, 
+                  borderColor: '#ec4899', 
+                  backgroundColor: 'rgba(236,72,153,0.4)', 
+                  borderWidth: 3,
+                  pointRadius: 4,
+                  pointHoverRadius: 6,
+                  pointBackgroundColor: '#ec4899',
+                  pointBorderColor: '#fff',
+                  pointBorderWidth: 2
+                }] 
+              }" 
+              :options="radarOptions" 
+            />
+          </div>
+        </div>
           </div>
           <div class="chart-body doughnut-body">
             <Doughnut v-if="muscleGroupData" :data="muscleGroupData" :options="doughnutOptions" />
