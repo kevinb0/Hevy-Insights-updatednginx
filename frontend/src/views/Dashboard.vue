@@ -35,9 +35,22 @@ const loading = computed(() => store.isLoadingWorkouts || store.isLoadingUser);
 const userAccount = computed(() => store.userAccount);
 const workouts = computed(() => store.workouts);
 
-// ---------- Weekly Aggregations & Filters ----------
+// ---------- Individual Chart Range Filters ----------
 type Range = "1m" | "3m" | "6m" | "1y" | "all";
+type DisplayStyle = "mo" | "wk";
+
+const hoursTrained_Range = ref<Range>("6m");
+const hoursTrained_Display = ref<DisplayStyle>("mo");
+
+const volumeProgression_Range = ref<Range>("6m");
+const volumeProgression_Display = ref<DisplayStyle>("mo");
+
+const repsAndSets_Range = ref<Range>("6m");
+const repsAndSets_Display = ref<DisplayStyle>("mo");
+
 const range = ref<Range>("6m");
+
+const muscleDistribution_Range = ref<Range>("all");
 
 const startOfWeek = (d: Date) => {
   const dd = new Date(d);
@@ -52,21 +65,23 @@ const weekKey = (d: Date) => {
   return m.toISOString().slice(0,10);
 };
 
-const filteredByRange = computed(() => {
+// Helper to filter by range
+const filterByRange = (range: Range) => {
   const now = new Date();
-  let weeksBack = 26; // default ~6 months
-  if (range.value === "1m") weeksBack = 4;
-  else if (range.value === "3m") weeksBack = 12;
-  else if (range.value === "6m") weeksBack = 26; // approx 6 months
-  else if (range.value === "1y") weeksBack = 52;
-  else if (range.value === "all") weeksBack = 520;
-  const start = startOfWeek(new Date(now));
-  start.setDate(start.getDate() - weeksBack * 7);
+  let daysBack = 180; // default ~6 months
+  if (range === "1m") daysBack = 30;
+  else if (range === "3m") daysBack = 90;
+  else if (range === "6m") daysBack = 180;
+  else if (range === "1y") daysBack = 365;
+  else if (range === "all") daysBack = 365 * 10; // 10 years
+  const start = new Date(now);
+  start.setDate(start.getDate() - daysBack);
   const cutoff = Math.floor(start.getTime() / 1000);
   return workouts.value.filter((w: any) => (w.start_time || 0) >= cutoff);
-});
+};
 
-const weeksAgg = computed(() => {
+// Aggregate by period
+const aggregateByPeriod = (_range: Range, displayStyle: DisplayStyle, filteredWorkouts: any[]) => {
   const map: Record<string, {
     durationMin: number;
     volumeKg: number;
@@ -74,9 +89,13 @@ const weeksAgg = computed(() => {
     sets: number;
     workouts: number;
   }> = {};
-  for (const w of filteredByRange.value) {
+  
+  // Use display style preference
+  const useWeeks = displayStyle === "wk";
+  
+  for (const w of filteredWorkouts) {
     const d = new Date((w.start_time || 0) * 1000);
-    const key = weekKey(d);
+    const key = useWeeks ? weekKey(d) : monthKey(d);
     const entry = (map[key] ||= { durationMin: 0, volumeKg: 0, reps: 0, sets: 0, workouts: 0 });
     entry.workouts += 1;
     entry.volumeKg += w.estimated_volume_kg || 0;
@@ -89,21 +108,76 @@ const weeksAgg = computed(() => {
       }
     }
   }
-  // sorted by week ascending
   const keys = Object.keys(map).sort();
-  return keys.map(k => ({ week: k, ...map[k] }));
+  return keys.map(k => ({ period: k, ...map[k] }));
+};
+
+// Hours trained per week/month
+const hoursTrained_Data = computed(() => {
+  const filtered = filterByRange(hoursTrained_Range.value);
+  const agg = aggregateByPeriod(hoursTrained_Range.value, hoursTrained_Display.value, filtered);
+  return {
+    labels: agg.map(w => w.period),
+    data: agg.map(w => Number(((w.durationMin ?? 0) / 60).toFixed(2)))
+  };
 });
 
-// Hours trained per week
-const hoursPerWeekLabels = computed(() => weeksAgg.value.map(w => w.week));
-const hoursPerWeekData = computed(() => weeksAgg.value.map(w => Number((((w.durationMin ?? 0) / 60)).toFixed(2))));
+// Volume per week/month
+const volumeProgression_Data = computed(() => {
+  const filtered = filterByRange(volumeProgression_Range.value);
+  const agg = aggregateByPeriod(volumeProgression_Range.value, volumeProgression_Display.value, filtered);
+  return {
+    labels: agg.map(w => w.period),
+    data: agg.map(w => Math.round(w.volumeKg ?? 0))
+  };
+});
 
-// Volume per week
-const volumePerWeekData = computed(() => weeksAgg.value.map(w => Math.round(w.volumeKg ?? 0)));
+// Reps/Sets per week/month
+const repsAndSets_Data = computed(() => {
+  const filtered = filterByRange(repsAndSets_Range.value);
+  const agg = aggregateByPeriod(repsAndSets_Range.value, repsAndSets_Display.value, filtered);
+  return {
+    labels: agg.map(w => w.period),
+    reps: agg.map(w => w.reps ?? 0),
+    sets: agg.map(w => w.sets ?? 0)
+  };
+});
+// Weekly Rhythm - Distribution across days of week
+const weeklyRhythm_Data = computed(() => {
+  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const counts = [0, 0, 0, 0, 0, 0, 0];
+  
+  for (const w of workouts.value) {
+    const d = new Date((w.start_time || 0) * 1000);
+    const day = d.getDay(); // 0=Sun, 1=Mon, ...
+    const idx = day === 0 ? 6 : day - 1; // Convert to Mon=0, Sun=6
+    if (idx >= 0 && idx < counts.length && counts[idx] !== undefined) counts[idx] += 1;
+  }
+  
+  return {
+    labels: days,
+    data: counts
+  };
+});
 
-// Reps/Sets per week
-const repsPerWeekData = computed(() => weeksAgg.value.map(w => w.reps ?? 0));
-const setsPerWeekData = computed(() => weeksAgg.value.map(w => w.sets ?? 0));
+// Muscle Distribution
+const muscleDistribution_Data = computed(() => {
+  const filtered = filterByRange(muscleDistribution_Range.value);
+  const muscleGroups: { [key: string]: number } = {};
+  
+  for (const w of filtered) {
+    for (const ex of (w.exercises || [])) {
+      const muscleGroup = ex.muscle_group || "Unknown";
+      const setsCount = ex.sets?.length || 0;
+      muscleGroups[muscleGroup] = (muscleGroups[muscleGroup] || 0) + setsCount;
+    }
+  }
+  
+  return {
+    labels: Object.keys(muscleGroups),
+    data: Object.values(muscleGroups)
+  };
+});
 
 // Workout streak (weeks with >=1 workout)
 const workoutStreakWeeks = computed(() => {
@@ -155,19 +229,11 @@ const fetchData = async () => {
 const processChartData = () => {
   const dates: string[] = [];
   const volumes: number[] = [];
-  const muscleGroups: { [key: string]: number } = {};
 
   workouts.value.forEach((workout) => {
     const date = new Date(workout.start_time * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric" });
     dates.push(date);
     volumes.push(workout.estimated_volume_kg || 0);
-
-    // Count muscle groups
-    workout.exercises?.forEach((exercise: any) => {
-      const muscleGroup = exercise.muscle_group || "Unknown";
-      const setsCount = exercise.sets?.length || 0;
-      muscleGroups[muscleGroup] = (muscleGroups[muscleGroup] || 0) + setsCount;
-    });
   });
 
   chartData.value = {
@@ -184,29 +250,6 @@ const processChartData = () => {
       },
     ],
   };
-
-  const muscleGroupLabels = Object.keys(muscleGroups);
-  const muscleGroupValues = Object.values(muscleGroups);
-
-  muscleGroupData.value = {
-    labels: muscleGroupLabels,
-    datasets: [
-      {
-        data: muscleGroupValues,
-        backgroundColor: [
-          "#10b981",
-          "#06b6d4",
-          "#8b5cf6",
-          "#f59e0b",
-          "#ef4444",
-          "#ec4899",
-          "#14b8a6",
-          "#f97316",
-        ],
-        borderWidth: 0,
-      },
-    ],
-  };
 };
 
 const totalWorkouts = computed(() => workouts.value.length);
@@ -217,7 +260,6 @@ const avgVolume = computed(() =>
   totalWorkouts.value > 0 ? Math.round(totalVolume.value / totalWorkouts.value) : 0
 );
 
-// Total hours trained across all workouts
 const totalMinutesAll = computed(() => {
   let mins = 0;
   for (const w of workouts.value) {
@@ -235,24 +277,33 @@ const chartOptions = {
   plugins: {
     legend: {
       display: false,
+      labels: {
+        color: "#94a3b8",
+        font: { size: 11 }
+      }
     },
   },
   scales: {
     y: {
       grid: {
-        color: "#2b3553",
+        color: "#334155",
+        drawBorder: false
       },
       ticks: {
-        color: "#9A9A9A",
+        color: "#94a3b8",
+        font: { size: 11 }
       },
+      border: { display: false }
     },
     x: {
       grid: {
         display: false,
       },
       ticks: {
-        color: "#9A9A9A",
+        color: "#94a3b8",
+        font: { size: 11 }
       },
+      border: { display: false }
     },
   },
 };
@@ -264,17 +315,54 @@ const doughnutOptions = {
     legend: {
       position: "right" as const,
       labels: {
-        color: "#9A9A9A",
-        padding: 15,
+        color: "#94a3b8",
+        padding: 12,
         font: {
-          size: 12,
+          size: 11,
         },
       },
     },
   },
 };
 
-onMounted(fetchData);
+const radarOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  elements: {
+    line: {
+      borderWidth: 0
+    },
+    point: {
+      radius: 0,
+      hitRadius: 0,
+      hoverRadius: 0
+    }
+  },
+  plugins: {
+    legend: {
+      display: false,
+    },
+  },
+  scales: {
+    r: {
+      grid: {
+        color: "#334155",
+      },
+      angleLines: {
+        color: "#334155",
+      },
+      pointLabels: {
+        color: "#94a3b8",
+        font: { size: 11 }
+      },
+      ticks: {
+        color: "#94a3b8",
+        backdropColor: "transparent",
+        font: { size: 10 }
+      }
+    }
+  }
+};
 </script>
 
 <!-- =============================================================================== -->
@@ -367,38 +455,164 @@ onMounted(fetchData);
         </div>
       </div>
 
-      <!-- Charts Section -->
-      <div class="charts-toolbar">
-        <div class="filters">
-          <label class="filter-label">Range</label>
-          <select v-model="range" class="filter-select">
-            <option value="1m">1 Month</option>
-            <option value="3m">3 Months</option>
-            <option value="6m">6 Months</option>
-            <option value="1y">1 Year</option>
-            <option value="all">All</option>
-          </select>
-        </div>
-      </div>
-
+      <!-- Charts Section - 2 Column Grid -->
       <div class="charts-grid">
-        <div class="chart-container large-chart">
-          <div class="chart-header">
-            <h2>Hours Trained Per Week</h2>
-            <span class="chart-subtitle">Filtered by range</span>
-          </div>
-          <div class="chart-body">
-            <Line :key="'hours-' + range" :data="{ labels: hoursPerWeekLabels, datasets: [{ label: 'Hours', data: hoursPerWeekData, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.2)', fill: true, tension: 0.3 }] }" :options="chartOptions" />
-          </div>
-        </div>
-
+        <!-- Hours Trained Chart -->
         <div class="chart-container">
           <div class="chart-header">
-            <h2>Volume Per Week</h2>
-            <span class="chart-subtitle">Filtered by range</span>
+            <div class="chart-title-section">
+              <h2>⏳ Hours Trained</h2>
+              <span class="chart-subtitle">Your training duration over time</span>
+            </div>
+            <div class="chart-filters">
+              <div class="filter-group">
+                <button @click="hoursTrained_Range = 'all'" :class="['filter-btn', { active: hoursTrained_Range === 'all' }]" title="All Time">All</button>
+                <button @click="hoursTrained_Range = '1y'" :class="['filter-btn', { active: hoursTrained_Range === '1y' }]" title="1 Year">1Y</button>
+                <button @click="hoursTrained_Range = '6m'" :class="['filter-btn', { active: hoursTrained_Range === '6m' }]" title="6 Months">6M</button>
+                <button @click="hoursTrained_Range = '3m'" :class="['filter-btn', { active: hoursTrained_Range === '3m' }]" title="3 Months">3M</button>
+                <button @click="hoursTrained_Range = '1m'" :class="['filter-btn', { active: hoursTrained_Range === '1m' }]" title="1 Month">1M</button>
+              </div>
+              <div class="filter-group">
+                <button @click="hoursTrained_Display = 'mo'" :class="['filter-btn', { active: hoursTrained_Display === 'mo' }]" title="Monthly">Mo</button>
+                <button @click="hoursTrained_Display = 'wk'" :class="['filter-btn', { active: hoursTrained_Display === 'wk' }]" title="Weekly">Wk</button>
+              </div>
+            </div>
           </div>
           <div class="chart-body">
-            <Line :key="'volume-' + range" :data="{ labels: hoursPerWeekLabels, datasets: [{ label: 'Volume (kg)', data: volumePerWeekData, borderColor: '#06b6d4', backgroundColor: 'rgba(6,182,212,0.2)', fill: true, tension: 0.3 }] }" :options="chartOptions" />
+            <Line 
+              :key="'hours-' + hoursTrained_Range" 
+              :data="{ 
+                labels: hoursTrained_Data.labels, 
+                datasets: [{ 
+                  label: 'Hours', 
+                  data: hoursTrained_Data.data, 
+                  borderColor: '#10b981', 
+                  backgroundColor: 'rgba(16,185,129,0.2)', 
+                  fill: true, 
+                  tension: 0.4,
+                  borderWidth: 2,
+                  pointRadius: 3,
+                  pointHoverRadius: 5
+                }] 
+              }" 
+              :options="chartOptions" 
+            />
+          </div>
+        </div>
+
+        <!-- Volume Chart -->
+        <div class="chart-container">
+          <div class="chart-header">
+            <div class="chart-title-section">
+              <h2>💪 Volume Progression</h2>
+              <span class="chart-subtitle">Total weight lifted per period</span>
+            </div>
+            <div class="chart-filters">
+              <div class="filter-group">
+                <button @click="volumeProgression_Range = 'all'" :class="['filter-btn', { active: volumeProgression_Range === 'all' }]" title="All Time">All</button>
+                <button @click="volumeProgression_Range = '1y'" :class="['filter-btn', { active: volumeProgression_Range === '1y' }]" title="1 Year">1Y</button>
+                <button @click="volumeProgression_Range = '6m'" :class="['filter-btn', { active: volumeProgression_Range === '6m' }]" title="6 Months">6M</button>
+                <button @click="volumeProgression_Range = '3m'" :class="['filter-btn', { active: volumeProgression_Range === '3m' }]" title="3 Months">3M</button>
+                <button @click="volumeProgression_Range = '1m'" :class="['filter-btn', { active: volumeProgression_Range === '1m' }]" title="1 Month">1M</button>
+              </div>
+              <div class="filter-group">
+                <button @click="volumeProgression_Display = 'mo'" :class="['filter-btn', { active: volumeProgression_Display === 'mo' }]" title="Monthly">Mo</button>
+                <button @click="volumeProgression_Display = 'wk'" :class="['filter-btn', { active: volumeProgression_Display === 'wk' }]" title="Weekly">Wk</button>
+              </div>
+            </div>
+          </div>
+          <div class="chart-body">
+            <Line 
+              :key="'volume-' + volumeProgression_Range" 
+              :data="{ 
+                labels: volumeProgression_Data.labels, 
+                datasets: [{ 
+                  label: 'Volume (kg)', 
+                  data: volumeProgression_Data.data, 
+                  borderColor: '#06b6d4', 
+                  backgroundColor: 'rgba(6,182,212,0.2)', 
+                  fill: true, 
+                  tension: 0.4,
+                  borderWidth: 2,
+                  pointRadius: 3,
+                  pointHoverRadius: 5
+                }] 
+              }" 
+              :options="chartOptions" 
+            />
+          </div>
+        </div>
+
+        <!-- Reps/Sets Chart -->
+        <div class="chart-container">
+          <div class="chart-header">
+            <div class="chart-title-section">
+              <h2>📊 Reps & Sets</h2>
+              <span class="chart-subtitle">Training volume breakdown</span>
+            </div>
+            <div class="chart-filters">
+              <div class="filter-group">
+                <button @click="repsAndSets_Range = 'all'" :class="['filter-btn', { active: repsAndSets_Range === 'all' }]" title="All Time">All</button>
+                <button @click="repsAndSets_Range = '1y'" :class="['filter-btn', { active: repsAndSets_Range === '1y' }]" title="1 Year">1Y</button>
+                <button @click="repsAndSets_Range = '6m'" :class="['filter-btn', { active: repsAndSets_Range === '6m' }]" title="6 Months">6M</button>
+                <button @click="repsAndSets_Range = '3m'" :class="['filter-btn', { active: repsAndSets_Range === '3m' }]" title="3 Months">3M</button>
+                <button @click="repsAndSets_Range = '1m'" :class="['filter-btn', { active: repsAndSets_Range === '1m' }]" title="1 Month">1M</button>
+              </div>
+              <div class="filter-group">
+                <button @click="repsAndSets_Display = 'mo'" :class="['filter-btn', { active: repsAndSets_Display === 'mo' }]" title="Monthly">Mo</button>
+                <button @click="repsAndSets_Display = 'wk'" :class="['filter-btn', { active: repsAndSets_Display === 'wk' }]" title="Weekly">Wk</button>
+              </div>
+            </div>
+          </div>
+          <div class="chart-body">
+            <Line 
+              :key="'rs-' + repsAndSets_Range" 
+              :data="{ 
+                labels: repsAndSets_Data.labels, 
+                datasets: [
+                  { 
+                    label: 'Reps', 
+                    data: repsAndSets_Data.reps, 
+                    borderColor: '#8b5cf6', 
+                    backgroundColor: 'rgba(139,92,246,0.15)', 
+                    fill: true, 
+                    tension: 0.4,
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    pointHoverRadius: 5
+                  },
+                  { 
+                    label: 'Sets', 
+                    data: repsAndSets_Data.sets, 
+                    borderColor: '#f59e0b', 
+                    backgroundColor: 'rgba(245,158,11,0.15)', 
+                    fill: true, 
+                    tension: 0.4,
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    pointHoverRadius: 5
+                  }
+                ] 
+              }" 
+              :options="{ 
+                ...chartOptions, 
+                plugins: { 
+                  ...chartOptions.plugins, 
+                  legend: { 
+                    display: true, 
+                    position: 'top' as const,
+                    labels: { 
+                      color: '#94a3b8', 
+                      font: { size: 11 },
+                      usePointStyle: true,
+                      boxWidth: 6,
+                      boxHeight: 6,
+                      padding: 15
+                    } 
+                  } 
+                } 
+              }" 
+            />
           </div>
         </div>
 
@@ -426,10 +640,10 @@ onMounted(fetchData);
           <div class="chart-body radar-body">
             <Radar 
               :data="{ 
-                labels: weeklyRhythmData.labels, 
+                labels: weeklyRhythm_Data.labels, 
                 datasets: [{ 
                   label: 'Workouts', 
-                  data: weeklyRhythmData.data, 
+                  data: weeklyRhythm_Data.data, 
                   borderColor: '#ec4899', 
                   backgroundColor: 'rgba(236,72,153,0.4)', 
                   borderWidth: 3,
@@ -444,9 +658,46 @@ onMounted(fetchData);
             />
           </div>
         </div>
+
+        <!-- Muscle Distribution Chart -->
+        <div class="chart-container">
+          <div class="chart-header">
+            <div class="chart-title-section">
+              <h2>🎯 Muscle Distribution</h2>
+              <span class="chart-subtitle">Sets by muscle group</span>
+            </div>
+            <div class="chart-filters">
+              <div class="filter-group">
+                <button @click="muscleDistribution_Range = 'all'" :class="['filter-btn', { active: muscleDistribution_Range === 'all' }]" title="All Time">All</button>
+                <button @click="muscleDistribution_Range = '1y'" :class="['filter-btn', { active: muscleDistribution_Range === '1y' }]" title="1 Year">1Y</button>
+                <button @click="muscleDistribution_Range = '6m'" :class="['filter-btn', { active: muscleDistribution_Range === '6m' }]" title="6 Months">6M</button>
+                <button @click="muscleDistribution_Range = '3m'" :class="['filter-btn', { active: muscleDistribution_Range === '3m' }]" title="3 Months">3M</button>
+                <button @click="muscleDistribution_Range = '1m'" :class="['filter-btn', { active: muscleDistribution_Range === '1m' }]" title="1 Month">1M</button>
+              </div>
+            </div>
           </div>
           <div class="chart-body doughnut-body">
-            <Doughnut v-if="muscleGroupData" :data="muscleGroupData" :options="doughnutOptions" />
+            <Doughnut 
+              :key="'muscle-' + muscleDistribution_Range"
+              :data="{
+                labels: muscleDistribution_Data.labels,
+                datasets: [{
+                  data: muscleDistribution_Data.data,
+                  backgroundColor: [
+                    '#10b981',
+                    '#06b6d4',
+                    '#8b5cf6',
+                    '#f59e0b',
+                    '#ef4444',
+                    '#ec4899',
+                    '#14b8a6',
+                    '#f97316',
+                  ],
+                  borderWidth: 0,
+                }]
+              }" 
+              :options="doughnutOptions" 
+            />
           </div>
         </div>
       </div>
