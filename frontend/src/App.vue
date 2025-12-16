@@ -148,6 +148,9 @@ watch(isMobileSidebarOpen, (open) => {
             <a href="mailto:hevy@kida.one" target="_blank" class="footer-btn">
               📧 Contact me
             </a>
+            <a href="https://buymeacoffee.com/casudo" target="_blank" class="footer-btn">
+              ☕ Buy me a coffee
+            </a>
             <a href="https://github.com/casudo/Hevy-Insights" target="_blank" class="footer-btn">
               ⭐ Star on GitHub
             </a>
