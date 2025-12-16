@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Header, Query
+from fastapi import FastAPI, HTTPException, Header, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import Optional
@@ -91,7 +91,7 @@ def get_auth_token(auth_token: Optional[str]) -> str:
 
 @app.post("/api/login", response_model=LoginResponse, tags=["Authentication"])
 @limiter.limit("5/minute")  # Max 5 login attempts per minute per IP
-def login(credentials: LoginRequest) -> LoginResponse:
+def login(credentials: LoginRequest, request: Request) -> LoginResponse:
     """
     Login with Hevy credentials to obtain an authentication token.
 
