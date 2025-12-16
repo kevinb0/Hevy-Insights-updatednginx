@@ -862,14 +862,14 @@ onMounted(() => {
   padding: 1.5rem 1.25rem;
   width: 100%;
   min-height: 100vh;
-  background: #0f172a;
+  background: var(--bg-primary);
 }
 
 /* Header Styles */
 .dashboard-header {
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid rgba(16, 185, 129, 0.15);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .header-content {
@@ -882,7 +882,7 @@ onMounted(() => {
 
 .title-section h1 {
   margin: 0;
-  color: #f8fafc;
+  color: var(--text-primary);
   font-size: 2rem;
   font-weight: 700;
   letter-spacing: -0.5px;
@@ -894,7 +894,7 @@ onMounted(() => {
 
 .subtitle {
   margin: 0.5rem 0 0;
-  color: #94a3b8;
+  color: var(--text-secondary);
   font-size: 1rem;
   font-weight: 400;
 }
@@ -909,10 +909,10 @@ onMounted(() => {
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  border: 1px solid rgba(51, 65, 85, 0.5);
-  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
   backdrop-filter: blur(8px);
-  color: #94a3b8;
+  color: var(--text-secondary);
   font-size: 1.5rem;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -925,24 +925,24 @@ onMounted(() => {
   border-color: var(--color-primary, #10b981);
   color: var(--color-primary, #10b981);
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--color-primary, #10b981) 30%, transparent);
 }
 
 .user-badge {
   display: flex;
   align-items: center;
   gap: 1rem;
-  background: rgba(15, 23, 42, 0.7);
+  background: var(--bg-card);
   backdrop-filter: blur(8px);
   padding: 0.75rem 1.25rem;
   border-radius: 50px;
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  border: 1px solid var(--border-color);
   transition: all 0.3s ease;
 }
 
 .user-badge:hover {
   border-color: var(--color-primary, #10b981);
-  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--color-primary, #10b981) 30%, transparent);
   transform: translateY(-2px);
 }
 
@@ -969,13 +969,13 @@ onMounted(() => {
 
 .user-details strong {
   font-size: 0.95rem;
-  color: #f8fafc;
+  color: var(--text-primary);
   font-weight: 600;
 }
 
 .user-details span {
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: var(--text-secondary);
 }
 
 /* Loading State */
@@ -986,6 +986,10 @@ onMounted(() => {
   justify-content: center;
   padding: 6rem 2rem;
   gap: 1.5rem;
+}
+
+.loading-container p {
+  color: var(--text-secondary);
 }
 
 .loading-spinner {
