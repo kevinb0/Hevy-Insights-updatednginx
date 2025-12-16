@@ -423,6 +423,32 @@ const radarOptions = {
   }
 };
 
+// Generate distinct colors for muscle distribution (fixed palette)
+const generateGradientColors = (count: number): string[] => {
+  // Fixed distinct color palette that works well together
+  const distinctColors = [
+    "#10b981", // Emerald
+    "#3b82f6", // Blue
+    "#f59e0b", // Amber
+    "#ef4444", // Red
+    "#8b5cf6", // Purple
+    "#06b6d4", // Cyan
+    "#ec4899", // Pink
+    "#14b8a6", // Teal
+    "#f97316", // Orange
+    "#6366f1", // Indigo
+    "#22c55e", // Green
+    "#eab308", // Yellow
+  ];
+  
+  // Return only the colors we need, cycling if necessary
+  const result: string[] = [];
+  for (let i = 0; i < count; i++) {
+    result.push(distinctColors[i % distinctColors.length]!);
+  }
+  return result;
+};
+
 onMounted(() => {
   fetchData();
 });
@@ -777,16 +803,7 @@ onMounted(() => {
                 labels: muscleDistribution_Data.labels,
                 datasets: [{
                   data: muscleDistribution_Data.data,
-                  backgroundColor: [
-                    '#10b981',
-                    '#06b6d4',
-                    '#8b5cf6',
-                    '#f59e0b',
-                    '#ef4444',
-                    '#ec4899',
-                    '#14b8a6',
-                    '#f97316',
-                  ],
+                  backgroundColor: generateGradientColors(muscleDistribution_Data.data.length),
                   borderWidth: 0,
                 }]
               }" 
