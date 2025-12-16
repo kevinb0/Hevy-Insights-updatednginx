@@ -29,7 +29,7 @@ const handleLogin = async () => {
       error.value = "Login failed. Please try again.";
     }
   } catch (err: any) {
-    error.value = err.response?.data?.error || "Invalid credentials. Please try again.";
+    error.value = err.response?.data?.detail || "Invalid credentials. Please try again.";
   } finally {
     loading.value = false;
   }

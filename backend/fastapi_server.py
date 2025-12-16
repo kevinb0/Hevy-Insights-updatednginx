@@ -1,10 +1,13 @@
-from fastapi import FastAPI, HTTPException, Header, Query
+from fastapi import FastAPI, HTTPException, Header, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import Optional
 from hevy_api import HevyClient, HevyError
 from dotenv import load_dotenv
 import logging
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 ### ===============================================================================
 
@@ -17,14 +20,22 @@ load_dotenv()
 app = FastAPI(
     title="Hevy Insights API",
     description="Backend API for Hevy Insights",
-    version="1.0.1",
+    version="1.1.0",
     docs_url="/api/docs",  # Swagger
 )
+### Initialize rate limiter
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Vue dev server
+    allow_origins=[
+        "http://localhost:5173",  # Vue dev server
+        "http://localhost:80",  # Production (Nginx proxy)
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST"],  # Only allow necessary methods
     allow_headers=["*"],
 )
 
@@ -79,14 +90,15 @@ def get_auth_token(auth_token: Optional[str]) -> str:
 
 
 @app.post("/api/login", response_model=LoginResponse, tags=["Authentication"])
-async def login(credentials: LoginRequest):
+@limiter.limit("5/minute")  # Max 5 login attempts per minute per IP
+def login(credentials: LoginRequest, request: Request) -> LoginResponse:
     """
     Login with Hevy credentials to obtain an authentication token.
 
     - **emailOrUsername**: Your Hevy username or email
     - **password**: Your Hevy password
 
-    Returns auth token.
+    Returns auth token. Rate limited to 5 attempts per minute.
     """
     try:
         client = HevyClient()
@@ -103,7 +115,7 @@ async def login(credentials: LoginRequest):
 
 
 @app.post("/api/validate", response_model=ValidateTokenResponse, tags=["Authentication"])
-async def validate_token(token_data: ValidateTokenRequest) -> ValidateTokenResponse:
+def validate_token(token_data: ValidateTokenRequest) -> ValidateTokenResponse:
     """
     Validate an authentication token.
 
@@ -123,7 +135,7 @@ async def validate_token(token_data: ValidateTokenRequest) -> ValidateTokenRespo
 
 
 @app.get("/api/user/account", tags=["User"])
-async def get_user_account(auth_token: str = Header(..., alias="auth-token")) -> dict:
+def get_user_account(auth_token: str = Header(..., alias="auth-token")) -> dict:
     """
     Get authenticated user's account information.
 
@@ -144,7 +156,7 @@ async def get_user_account(auth_token: str = Header(..., alias="auth-token")) ->
 
 
 @app.get("/api/workouts", tags=["Workouts"])
-async def get_workouts(
+def get_workouts(
     auth_token: str = Header(..., alias="auth-token"),
     offset: int = Query(0, ge=0, description="Pagination offset (increments of 5)"),
     username: str = Query(..., description="Filter by username"),

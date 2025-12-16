@@ -47,6 +47,7 @@ Hevy Insights allows you to log in with your Hevy credentials and fetch your wor
 - **Authentication**: Login with Hevy credentials (no Hevy PRO membership required!). Credentials are stored in your browser's local storage **only**.
 - **Dashboard**: Interactive charts and statistics of your workouts, including volume, muscle distribution and hours trained.
 - **Workout History**: Workout logs with detailed exercise information up to the date of account creation - card or list design.
+- **Exercises**: View all exercises with video thumbnails and detailed stats.
 
 # Screenshots
 
@@ -82,19 +83,21 @@ The latest version is always hosted there.
 
 Clone/download the repository and follow these steps:
 
-0. Install the backend and frontend dependencies as described in the [Development](#development) section below.
+1. Rename `.env.example` to `.env`.
 
-1. **Start the backend** (Terminal 1):
+2. Install the backend and frontend dependencies.
+
+3. **Start the backend** (Terminal 1):
 
    `python backend/fastapi_server.py`
 
-2. **Start the frontend** (Terminal 2):
+4. **Start the frontend** (Terminal 2):
 
    `cd frontend; npm run dev`
 
-3. **Open your browser** and navigate to `http://localhost:5173`
+5. **Open your browser** and navigate to `http://localhost:5173`
 
-4. **Login** with your Hevy username/email and password
+6. **Login** with your Hevy username/email and password
 
 ---
 
@@ -104,6 +107,7 @@ Clone/download the repository and follow these steps:
 - Translations for other languages
 - Settings page where the user can select translations and other preferences (date format, theme, etc.)
 - Better logging
+- Replace localStorage with HTTP cookie
 
 ---
 
