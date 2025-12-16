@@ -343,7 +343,8 @@ onMounted(async () => { await store.fetchWorkouts(); });
   .loading-container p { color: var(--text-secondary); font-size: 1.1rem; }
 
   .list { display: flex; flex-direction: column; gap: 0.75rem; }
-  .item { border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-card); overflow: hidden; }
+  .item { border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-card); overflow: hidden; transition: all 0.3s ease; }
+  .item:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); border-color: var(--color-primary, #10b981); }
   .item-toggle { width: 100%; display: flex; align-items: center; justify-content: space-between; background: var(--bg-secondary); color: var(--text-primary); border: none; padding: 0.75rem 1rem; cursor: pointer; }
   .item .line { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem; }
   .line-date { color: var(--text-secondary); font-weight: 600; }

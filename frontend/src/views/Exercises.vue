@@ -501,7 +501,8 @@ const barChartOptions = {
 .loading-container p { color: var(--text-secondary); font-size: 1.1rem; }
 
 .exercise-list { display: flex; flex-direction: column; gap: 1rem; }
-.exercise-card { border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-card); padding: 1rem; }
+.exercise-card { border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-card); padding: 1rem; transition: all 0.3s ease; }
+.exercise-card:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); border-color: var(--color-primary, #10b981); }
 .card-toggle { width: 100%; display: flex; align-items: center; justify-content: space-between; background: var(--bg-secondary); color: var(--text-primary); border: none; padding: 0.6rem 0.75rem; cursor: pointer; border-radius: 8px; }
 .card-content { margin-top: 0.75rem; }
 .card-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-color); }

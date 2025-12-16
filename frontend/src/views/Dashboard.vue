@@ -1016,7 +1016,7 @@ onMounted(() => {
 }
 
 .stat-card {
-  background: rgba(11, 17, 31, 0.95);
+  background: rgba(30, 41, 59, 0.95);
   backdrop-filter: blur(8px);
   padding: 1.25rem 1rem;
   border-radius: 16px;
@@ -1101,7 +1101,7 @@ onMounted(() => {
 }
 
 .chart-container {
-  background: rgba(11, 17, 31, 0.95);
+  background: rgba(30, 41, 59, 0.95);
   backdrop-filter: blur(8px);
   border-radius: 16px;
   border: 1px solid rgba(51, 65, 85, 0.6);
