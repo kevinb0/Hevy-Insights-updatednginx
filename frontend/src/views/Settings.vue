@@ -120,6 +120,17 @@ const resetSettings = () => {
         </div>
       </div>
 
+      <!-- More Settings Sections (Future) -->
+      <div class="settings-section">
+        <div class="section-header">
+          <h2>📊 Language</h2>
+          <p class="section-description">Coming soon: Choose different languages for the interface</p>
+        </div>
+        <div class="coming-soon">
+          <span class="coming-soon-badge">🚧 Under Construction</span>
+        </div>
+      </div>
+
       <!-- Actions -->
       <div class="settings-actions">
         <button @click="resetSettings" class="btn-secondary">
@@ -378,6 +389,27 @@ const resetSettings = () => {
   font-size: 1rem;
   box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primary, #10b981) 40%, transparent);
 }
+
+/* Coming Soon */
+.coming-soon {
+  padding: 3rem 2rem;
+  text-align: center;
+  border: 2px dashed rgba(51, 65, 85, 0.5);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.coming-soon-badge {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 50px;
+  color: #fbbf24;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
 /* Actions */
 .settings-actions {
   display: flex;
