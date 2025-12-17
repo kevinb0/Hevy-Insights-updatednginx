@@ -508,7 +508,7 @@ main.without-sidebar {
     z-index: 1200;
   }
   
-  main {
+  main.with-sidebar {
     padding-top: var(--topbar-height);
   }
   
