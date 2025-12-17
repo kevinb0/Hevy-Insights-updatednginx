@@ -1,15 +1,32 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { authService } from "./services/api";
+import { useHevyCache } from "./stores/hevy_cache";
 
 const router = useRouter();
 const route = useRoute();
+const store = useHevyCache();
+const userAccount = computed(() => store.userAccount);
 const showNav = ref(false);
-const appVersion = "v1.1.0"; // Update version as needed
+const appVersion = "v1.2.0"; // Update version as needed
 const isMobileSidebarOpen = ref(false);
 const showTopbar = ref(true);
 const showScrollTop = ref(false);
+
+// Apply theme from localStorage
+const applyTheme = () => {
+  const savedTheme = localStorage.getItem("color-theme") || "default";
+  const colorThemes: Record<string, { primary: string; secondary: string }> = {
+    default: { primary: "#10b981", secondary: "#06b6d4" },
+    purple: { primary: "#8b5cf6", secondary: "#ec4899" },
+    blue: { primary: "#3b82f6", secondary: "#6366f1" },
+    orange: { primary: "#f59e0b", secondary: "#ef4444" }
+  };
+  const theme = colorThemes[savedTheme] || colorThemes.default;
+  document.documentElement.style.setProperty("--color-primary", theme!.primary);
+  document.documentElement.style.setProperty("--color-secondary", theme!.secondary);
+};
 
 const updateNavVisibility = () => {
   // Show nav/topbar on all routes except login
@@ -27,15 +44,16 @@ const logout = () => {
 
 // On mount to DOM (Document Object Model)
 onMounted(() => {
+  // Apply theme on initial load
+  applyTheme();
+
   updateNavVisibility();
-  let lastY = window.scrollY;
+  // Keep topbar always visible on mobile
+  showTopbar.value = true;
   const onScroll = () => {
     const y = window.scrollY;
-    // Show topbar when scrolling up or near top; hide on scroll down
-    showTopbar.value = y < 10 || y < lastY;
     // Show scroll to top button when scrolled down 300px
     showScrollTop.value = y > 300;
-    lastY = y;
   };
   window.addEventListener("scroll", onScroll, { passive: true });
 });
@@ -65,7 +83,7 @@ watch(isMobileSidebarOpen, (open) => {
     <header v-if="showNav && showTopbar" class="topbar">
       <button class="menu-btn" @click="isMobileSidebarOpen = !isMobileSidebarOpen">☰</button>
       <router-link to="/dashboard" class="topbar-brand">
-        <span class="brand-text">Hevy Insights</span>
+        <span class="brand-text">Hevy Insights<span v-if="userAccount" class="brand-username"> for {{ userAccount.username }}</span></span>
       </router-link>
     </header>
     
@@ -95,6 +113,11 @@ watch(isMobileSidebarOpen, (open) => {
           <span class="nav-icon">📚</span>
           <span class="nav-text">Exercises</span>
         </router-link>
+        <!-- Remove, since already included next to profile badge? -->
+        <router-link to="/settings" class="nav-item">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-text">Settings</span>
+        </router-link>        
       </nav>
 
       <div class="sidebar-footer">
@@ -117,6 +140,29 @@ watch(isMobileSidebarOpen, (open) => {
     <!-- Main Content Area -->
     <main :class="{ 'with-sidebar': showNav, 'without-sidebar': !showNav, 'dimmed': isMobileSidebarOpen }">
       <router-view />
+      
+      <!-- Global Footer (shown on all pages except login) -->
+      <footer v-if="showNav" class="global-footer">
+        <div class="footer-content">
+          <div class="footer-buttons">
+            <a href="mailto:hevy@kida.one" target="_blank" class="footer-btn">
+              📧 Contact me
+            </a>
+            <a href="https://buymeacoffee.com/casudo" target="_blank" class="footer-btn">
+              ☕ Buy me a coffee
+            </a>
+            <a href="https://github.com/casudo/Hevy-Insights" target="_blank" class="footer-btn">
+              ⭐ Star on GitHub
+            </a>
+            <a href="https://github.com/casudo/Hevy-Insights/issues/new" target="_blank" class="footer-btn">
+              🐛 Report a bug
+            </a>
+          </div>
+          <div class="footer-love">
+            Made with ❤️ by casudo
+          </div>
+        </div>
+      </footer>
     </main>
   </div>
 </template>
@@ -129,17 +175,17 @@ watch(isMobileSidebarOpen, (open) => {
 }
 
 :root {
-  --bg-primary: #1e1e2e;
-  --bg-secondary: #27293d;
-  --bg-card: #27293d;
-  --bg-card-hover: #2f3147;
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-card: #1e293b;
+  --bg-card-hover: #334155;
   --text-primary: #ffffff;
-  --text-secondary: #9A9A9A;
+  --text-secondary: #94a3b8;
   --emerald-primary: #10b981;
   --emerald-dark: #059669;
   --emerald-darker: #047857;
   --cyan-accent: #06b6d4;
-  --border-color: #2b3553;
+  --border-color: #334155;
   --shadow: rgba(0, 0, 0, 0.3);
   --sidebar-width: 260px;
   --topbar-height: 56px;
@@ -171,7 +217,7 @@ body.sidebar-open {
   height: 52px;
   min-width: 52px;
   min-height: 52px;
-  background: var(--emerald-primary);
+  background: var(--color-primary, #10b981);
   color: white;
   border: none;
   border-radius: 50%;
@@ -189,7 +235,7 @@ body.sidebar-open {
 }
 
 .scroll-to-top:hover {
-  background: var(--emerald-dark);
+  filter: brightness(1.2);
   transform: translateY(-4px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
 }
@@ -232,17 +278,19 @@ body.sidebar-open {
   top: 0;
   bottom: 0;
   width: var(--sidebar-width);
-  background: var(--bg-secondary);
-  border-right: 1px solid var(--border-color);
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.98) 0%, rgba(15, 23, 42, 0.98) 100%);
+  backdrop-filter: blur(8px);
+  border-right: 1px solid color-mix(in srgb, var(--color-primary, #10b981) 20%, var(--border-color));
   display: flex;
   flex-direction: column;
   z-index: 1000;
-  box-shadow: 2px 0 10px var(--shadow);
+  box-shadow: 2px 0 10px var(--shadow), inset -1px 0 0 color-mix(in srgb, var(--color-primary, #10b981) 10%, transparent);
 }
 
 .sidebar-header {
   padding: 1.5rem 1.25rem;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-primary, #10b981) 15%, var(--border-color));
+  background: linear-gradient(90deg, color-mix(in srgb, var(--color-primary, #10b981) 5%, transparent), transparent);
 }
 
 .sidebar-brand {
@@ -257,7 +305,8 @@ body.sidebar-open {
 }
 
 .sidebar-brand:hover {
-  color: var(--emerald-primary);
+  color: var(--color-primary, #10b981);
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--color-primary, #10b981) 30%, transparent));
 }
 
 .brand-icon {
@@ -291,12 +340,12 @@ body.sidebar-open {
 
 .nav-item:hover {
   color: var(--text-primary);
-  background: rgba(16, 185, 129, 0.1);
+  background: color-mix(in srgb, var(--color-primary, #10b981) 10%, transparent);
 }
 
 .nav-item.router-link-active {
-  color: var(--emerald-primary);
-  background: rgba(16, 185, 129, 0.15);
+  color: var(--color-primary, #10b981);
+  background: color-mix(in srgb, var(--color-primary, #10b981) 15%, transparent);
 }
 
 .nav-item.router-link-active::before {
@@ -307,7 +356,7 @@ body.sidebar-open {
   transform: translateY(-50%);
   width: 4px;
   height: 70%;
-  background: var(--emerald-primary);
+  background: var(--color-primary, #10b981);
   border-radius: 0 4px 4px 0;
 }
 
@@ -323,13 +372,15 @@ body.sidebar-open {
 
 .sidebar-footer {
   padding: 1rem 0.75rem;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid color-mix(in srgb, var(--color-primary, #10b981) 15%, var(--border-color));
+  background: linear-gradient(90deg, color-mix(in srgb, var(--color-primary, #10b981) 3%, transparent), transparent);
 }
 
 .version-info {
-  color: var(--text-secondary);
+  color: color-mix(in srgb, var(--color-primary, #10b981) 60%, var(--text-secondary));
   font-size: 0.8rem;
   margin: 0 0 0.5rem 0.5rem;
+  font-weight: 500;
 }
 
 .logout-btn {
@@ -366,11 +417,80 @@ main.without-sidebar {
   min-height: 100vh;
 }
 
+/* Global Footer */
+.global-footer {
+  padding: 1.5rem 1.5rem 1rem 1.5rem; /* Top, Right, Bottom, Left */
+  background: linear-gradient(180deg, transparent 0%, rgba(30, 41, 59, 0.5) 100%);
+  border-top: 1px solid color-mix(in srgb, var(--color-primary, #10b981) 10%, var(--border-color));
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.footer-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.footer-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  border: 1px solid rgba(51, 65, 85, 0.4);
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(8px);
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.footer-btn:hover {
+  border-color: var(--color-primary, #10b981);
+  color: var(--color-primary, #10b981);
+  background: rgba(30, 41, 59, 0.8);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-primary, #10b981) 20%, transparent);
+}
+
+.footer-love {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
   :root {
     --sidebar-width: 220px;
   }
+  
+  /* Footer buttons grid */
+  .footer-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .footer-btn {
+    justify-content: center;
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+  }
+  
   /* Mobile: stack topbar above content */
   #app { flex-direction: column; }
   .topbar {
@@ -381,20 +501,35 @@ main.without-sidebar {
     padding: 0 0.75rem;
     background: var(--bg-secondary);
     border-bottom: 1px solid var(--border-color);
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
     z-index: 1200;
-    transition: transform 0.2s ease;
+  }
+  
+  main {
+    padding-top: var(--topbar-height);
+  }
+  
+  .topbar.hidden {
+    transform: translateY(-100%);
+    opacity: 0;
   }
   .menu-btn {
-    background: rgba(16, 185, 129, 0.15);
-    color: var(--emerald-primary);
-    border: 1px solid rgba(16, 185, 129, 0.3);
+    background: color-mix(in srgb, var(--color-primary, #10b981) 15%, transparent);
+    color: var(--color-primary, #10b981);
+    border: 1px solid color-mix(in srgb, var(--color-primary, #10b981) 30%, transparent);
     border-radius: 6px;
     padding: 0.5rem 0.6rem;
     font-size: 1rem;
   }
   .topbar-brand { display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary); text-decoration: none; font-weight: 600; }
+  .brand-username { font-weight: 500; color: var(--text-secondary); font-style: italic;}
+  
+  .sidebar-header {
+    display: none;
+  }
   
   .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; top: var(--topbar-height); height: calc(100vh - var(--topbar-height)); bottom: auto; overflow-y: auto; }
   .sidebar.mobile-open { transform: translateX(0); }
@@ -425,6 +560,21 @@ main.without-sidebar {
   .nav-item {
     padding: 0.75rem 1rem;
     font-size: 0.9rem;
+  }
+  
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 0.5rem;
+  }
+  
+  .sidebar-nav .nav-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 48px;
   }
 }
 </style>

@@ -1,7 +1,7 @@
 openapi: "3.1.1"
 info:
   title: Free Hevy API Docs
-  version: "1.1.0"
+  version: "1.2.0"
   description: This Swagger documentation provides details about various Hevy API endpoints which can be retrieved without a Hevy PRO subscription.
   contact:
     name: casudo
@@ -662,7 +662,7 @@ paths:
                     type: string
                     description: The minimum required app version
                     example: "1.23.19"
-  /user_profile:
+  /user_profile/{username}:
     get:
       tags: [User]
       summary: Get another user's profile
@@ -1130,6 +1130,83 @@ paths:
                     type: boolean
                   volume_includes_warmup_sets:
                     type: boolean
+    put:
+      tags: [User]
+      summary: Update User Preferences
+      description: Update user preferences for the authenticated user.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: API string for authentication
+          example: klean_kanteen_insulated
+        - in: header
+          name: auth-token
+          required: true
+          schema:
+            type: string
+          description: Auth token for authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object                  
+              properties:
+                weight_unit:
+                  type: string
+                distance_unit:
+                  type: string
+                body_measurement_unit:
+                  type: string
+                first_weekday:
+                  type: string
+                default_rest_timer_seconds:
+                  type: integer
+                superset_scrolling:
+                  type: boolean
+                plate_calculator_enabled:
+                  type: boolean
+                rpe_enabled:
+                  type: boolean
+                inline_set_timer_enabled:
+                  type: boolean
+                default_workout_visibility_public:
+                  type: boolean
+                volume_includes_warmup_sets:
+                  type: boolean
+      responses:
+        "200":
+          description: List all user preferences after update
+          content:
+            application/json:
+              schema:
+                type: object                  
+                properties:
+                  username:
+                    type: string
+                  weight_unit:
+                    type: string
+                  distance_unit:
+                    type: string
+                  body_measurement_unit:
+                    type: string
+                  first_weekday:
+                    type: string
+                  superset_scrolling:
+                    type: boolean
+                  plate_calculator_enabled:
+                    type: boolean
+                  rpe_enabled:
+                    type: boolean
+                  inline_set_timer_enabled:
+                    type: boolean
+                  default_workout_visibility_public:
+                    type: boolean
+                  volume_includes_warmup_sets:
+                    type: boolean
   /user_subscription:
     get:
       tags: [User]
@@ -1482,3 +1559,785 @@ paths:
                           type: boolean
                           description: Indicates if the workout is liked by the authenticated user
                           example: false        
+  /users/{username}/availability:
+    get:
+      tags: [Registration]
+      summary: Check Username/Email Availability
+      description: Check if a username or email is available for registration.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: API string for authentication
+          example: klean_kanteen_insulated
+        - in: path
+          name: username
+          required: true
+          schema:
+            type: string
+          description: The username to check for availability
+          example: new_user123
+      responses:
+        "200":
+          description: Availability status of the username or email
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isAvailable:
+                    type: boolean
+                  suggestions:
+                    type: array
+                    items:
+                      type: string
+  /signup:
+    post:
+      tags: [Registration]
+      summary: User Signup
+      description: Register a new user account.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                recaptchaToken:
+                  type: string
+                acceptedTerms:
+                  type: boolean
+                useAuth2_0:
+                  type: boolean
+      responses:
+        "200":
+          description: Successful user registration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  auth_token:
+                    type: string
+                  user_id:
+                    type: string
+                  access_token:
+                    type: string
+                  refresh_token:
+                    type: string
+                  expires_at:
+                    type: string
+  /available_login_methods:
+    get:
+      tags: [Registration]
+      summary: Get Available Login Methods
+      description: Retrieve the available login methods for user authentication.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: API string for authentication
+          example: klean_kanteen_insulated
+        - in: header
+          name: auth-token
+          required: true
+          schema:
+            type: string
+          description: Auth token for authentication
+      responses:
+        "200":
+          description: List of available login methods
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  example: email
+  /create_saved_account:
+    post:
+      tags: [Registration]
+      summary: "???"
+      description: "???"
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: API string for authentication
+          example: klean_kanteen_insulated
+        - in: header
+          name: auth-token
+          required: true
+          schema:
+            type: string
+          description: Auth token for authentication
+      responses:
+        "200":
+          description: Returns secret string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  secret:
+                    type: string             
+        "403":
+          description: Forbidden
+          content:
+            application/text:
+              schema:
+                type: string
+                example: Forbidden
+  /exercise_bar_preferences:
+    get:
+      tags: [Exercises]
+      summary: Get Exercise Bar Preferences
+      description: Retrieve exercise bar preferences for the authenticated user.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: API string for authentication
+          example: klean_kanteen_insulated
+        - in: header
+          name: auth-token
+          required: true
+          schema:
+            type: string
+          description: Auth token for authentication
+      responses:
+        "200":
+          description: Exercise bar preferences for the authenticated user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    barId:
+                      type: integer
+                    exerciseTemplateId:
+                      type: string
+  /plate_calculator_bar:
+    get:
+      tags: [Exercises]
+      summary: Get Plate Calculator Bar
+      description: Retrieve plate calculator bar settings for the authenticated user.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: API string for authentication
+          example: klean_kanteen_insulated
+        - in: header
+          name: auth-token
+          required: true
+          schema:
+            type: string
+          description: Auth token for authentication
+      responses:
+        "200":
+          description: Plate calculator bar settings for the authenticated user
+          content:
+            application/json:
+              schema:
+                type: array
+  /exercise_template_units:
+    get:
+      tags: [Exercises]
+      summary: Get Exercise Template Units
+      description: Retrieve exercise template units for the authenticated user.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: API string for authentication
+          example: klean_kanteen_insulated
+        - in: header
+          name: auth-token
+          required: true
+          schema:
+            type: string
+          description: Auth token for authentication
+      responses:
+        "200":
+          description: Exercise template units for the authenticated user
+          content:
+            application/json:
+              schema:
+                type: array
+  /user_warmup_calculator_data:
+    get:
+      tags: [Exercises]
+      summary: Get User Warmup Calculator Data
+      description: Retrieve warmup calculator data for the authenticated user.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: API string for authentication
+          example: klean_kanteen_insulated
+        - in: header
+          name: auth-token
+          required: true
+          schema:
+            type: string
+          description: Auth token for authentication
+      responses:
+        "200":
+          description: Warmup calculator data for the authenticated user
+  /user_key_values:
+    get:
+      tags: [User]
+      summary: Get User Key Values
+      description: Retrieve key-value pairs for the authenticated user.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: API string for authentication
+          example: klean_kanteen_insulated
+        - in: header
+          name: auth-token
+          required: true
+          schema:
+            type: string
+          description: Auth token for authentication
+      responses:
+        "200":
+          description: Key-value pairs for the authenticated user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  NOTIFICATION_STORE_LAST_READ:
+                    type: string
+                  UPDATED_AT:
+                    type: string
+                  DisableSuggestedUsers:
+                    type: boolean
+                  hasDismissedDragAndDropRoutineTip:
+                    type: boolean
+                  EXERCISE_DETAIL_IS_SET_RECORDS_EXPANDED:
+                    type: boolean
+                  NOTIFICATION_STORE_LAST_NOTIFICATION_RECEIVED:
+                    type: string
+                  HAS_DISMISSED_MONTHLY_REPORT_CELL_10_2025:
+                    type: boolean
+                  HIDE_HEVY_COACH_LAUNCH_FEED_CELL:
+                    type: boolean
+                  HEVY_COACH_AUDIENCE_DECISION:
+                    type: string
+                    example: i-am-a-personal-trainer
+                  HAS_DISMISSED_MONTHLY_REPORT_CELL_11_2025:
+                    type: boolean
+                  HideContactsCellInFollowersAndFollowingScreens:
+                    type: boolean
+                  MonthlyReportPushEnabled:
+                    type: boolean      
+  /enabled_remote_feature_flags:
+    get:
+      tags: [User]
+      summary: Get Enabled Remote Feature Flags
+      description: Retrieve enabled remote feature flags for the authenticated user.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: API string for authentication
+          example: klean_kanteen_insulated
+        - in: header
+          name: auth-token
+          required: true
+          schema:
+            type: string
+          description: Auth token for authentication
+      responses:
+        "200":
+          description: Enabled remote feature flags for the authenticated user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  flags:
+                    type: array
+                    items:
+                      type: string
+  /push_notification_settings:
+    get:
+      tags: [User]
+      summary: Get Push Notification Settings
+      description: Retrieve push notification settings for the authenticated user.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: API string for authentication
+          example: klean_kanteen_insulated
+        - in: header
+          name: auth-token
+          required: true
+          schema:
+            type: string
+          description: Auth token for authentication
+      responses:
+        "200":
+          description: Push notification settings for the authenticated user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  comment_replies:
+                    type: boolean
+                  comment_likes:
+                    type: boolean
+                  comment_discussion:
+                    type: boolean
+                  comment_mention:
+                    type: boolean
+                  comment_on_workout:
+                    type: boolean
+                  follows:
+                    type: boolean
+                  likes:
+                    type: boolean
+                  monthly_report:
+                    type: boolean
+  /routines_sync_batch:
+    get:
+      tags: [Routines]
+      summary: Get Routines Sync Batch
+      description: Synchronize routines with Hevy API
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: API string for authentication
+          example: klean_kanteen_insulated
+        - in: header
+          name: auth-token
+          required: true
+          schema:
+            type: string
+          description: Auth token for authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated:
+                    type: array
+                  deleted:
+                    type: array
+                  isMore:
+                    type: boolean
+                  updated_at:
+                    type: string
+  /workouts_sync_batch:
+    get:
+      tags: [Workouts]
+      summary: Get Workouts Sync Batch
+      description: Synchronize workouts with Hevy API
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: API string for authentication
+          example: klean_kanteen_insulated
+        - in: header
+          name: auth-token
+          required: true
+          schema:
+            type: string
+          description: Auth token for authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated:
+                    type: array
+                  deleted:
+                    type: array
+                  isMore:
+                    type: boolean
+  /suggested_users:     
+    get:
+      tags: [User]
+      summary: Get Suggested Users
+      description: Retrieve a list of suggested users for the authenticated user.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: API string for authentication
+          example: klean_kanteen_insulated
+        - in: header
+          name: auth-token
+          required: true
+          schema:
+            type: string
+          description: Auth token for authentication
+      responses:
+        "200":
+          description: List of suggested users for the authenticated user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    username:
+                      type: string
+                    profile_pic:
+                      type: string
+                    verified:
+                      type: boolean             
+                    full_name:
+                      type: string
+                    following_status:
+                      type: string
+                    private_profile:
+                      type: boolean
+                    source:
+                      type: string
+                      example: mutual_follows
+                    label:
+                      type: string
+                      example: mutual_friends
+  /plate_calculator_plate:
+    get:
+      tags: [Exercises]
+      summary: Get Plate Calculator Plate
+      description: Retrieve plate calculator plate settings for the authenticated user.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: API string for authentication
+          example: klean_kanteen_insulated
+        - in: header
+          name: auth-token
+          required: true
+          schema:
+            type: string
+          description: Auth token for authentication
+      responses:
+        "200":
+          description: Plate calculator settings for the authenticated user
+          content:
+            application/json:
+              schema:
+                type: array
+  /ios_push_token:
+    post:
+      tags: [User]
+      summary: Register iOS Push Token
+      description: Register an iOS push notification token for the authenticated user.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: API string for authentication
+          example: klean_kanteen_insulated
+        - in: header
+          name: auth-token
+          required: true
+          schema:
+            type: string
+          description: Auth token for authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: The iOS push notification token to register
+                  example: abc123def456ghi789jkl012mno345pqr678stu901vwx234yz567890ab123cd4
+      responses:
+        "200":
+          description: Successful registration of the iOS push token
+  /user_metadata:
+    post:
+      tags: [User]
+      summary: Post User Metadata
+      description: Post metadata for the authenticated user.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: API string for authentication
+          example: klean_kanteen_insulated
+        - in: header
+          name: auth-token
+          required: true
+          schema:
+            type: string
+          description: Auth token for authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                appLanguage:
+                  type: string
+                platform:
+                  type: string
+                platformVersion:
+                  type: string
+                appVersion:
+                  type: string
+                securityId:
+                  type: string
+                appleIdfv:
+                  type: string
+      responses:
+        "200":
+          description: OK
+  /network_info:
+    post:
+      tags: [User]
+      summary: Post Network Info
+      description: Post network information for the authenticated user.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: API string for authentication
+          example: klean_kanteen_insulated
+        - in: header
+          name: auth-token
+          required: true
+          schema:
+            type: string
+          description: Auth token for authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                workouts:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      networkType:
+                        type: string
+                        description: Type of network connection
+                        example: wifi
+      responses:
+        "200":
+          description: OK     
+  /account:
+    put:
+      tags: [User]
+      summary: Update Account Information
+      description: Update account information for the authenticated user.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: API string for authentication
+          example: klean_kanteen_insulated
+        - in: header
+          name: auth-token
+          required: true
+          schema:
+            type: string
+          description: Auth token for authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                account:
+                  type: object
+                  properties:
+                    email_consent:
+                      type: boolean
+                      description: User's consent for email communications
+                      example: true
+  /routine:
+    post:
+      tags: [Routines]
+      summary: Create Routine
+      description: Create a new routine for the authenticated user.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: API string for authentication
+          example: klean_kanteen_insulated
+        - in: header
+          name: auth-token
+          required: true
+          schema:
+            type: string
+          description: Auth token for authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                routine:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                      description: Title of the routine
+                      example: "My New Routine"
+                    folder_id:
+                      type: string
+                      description: ID of the folder to which the routine belongs (else null)
+                    index:
+                      type: integer
+                      description: Index of the routine
+                    exercise:
+                      type: array
+                      description: List of exercises in the routine
+                      items:
+                        type: object
+                        properties:
+                          exercise_template_id:
+                            type: string
+                            description: The unique identifier for the exercise template
+                          notes:
+                            type: string
+                            description: Notes for the exercise
+                          sets:
+                            type: array
+                            description: List of sets for the exercise
+                            items:
+                              type: object
+                              properties:
+                                index:
+                                  type: integer
+                                  description: Index of the set
+                                indicator:
+                                  type: string
+                                weight_kg:
+                                  type: number
+                          rest_seconds:
+                            type: integer
+                            description: Rest time between exercises (in seconds)
+                    program_id:
+                      type: string
+                    notes:
+                      type: string
+                    _unsyncedObjectId:
+                      type: string
+                    clientId:
+                      type: string
+      responses:
+        "200":
+          description: Routine created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  routineId:
+                    type: string
+                    description: The unique identifier for the newly created routine
+  /user:
+    delete:
+      tags: [User]
+      summary: Delete User Account
+      description: Delete the authenticated user's account.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: API string for authentication
+          example: klean_kanteen_insulated
+        - in: header
+          name: auth-token
+          required: true
+          schema:
+            type: string
+          description: Auth token for authentication
+      responses:
+        "200":
+          description: User account deleted successfully

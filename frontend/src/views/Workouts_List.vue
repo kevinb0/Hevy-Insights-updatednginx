@@ -3,6 +3,7 @@ import { ref, computed, onMounted, nextTick } from "vue";
 import { useHevyCache } from "../stores/hevy_cache";
 
 const store = useHevyCache();
+const userAccount = computed(() => store.userAccount);
 
 // UI state
 const filterRange = ref<"all" | "1w" | "1m" | "3m" | "6m" | "12m">("all");
@@ -160,7 +161,8 @@ const weeks = computed(() => {
 });
 
 const cellColor = (count: number) => {
-  return count > 0 ? "#68d391" : "var(--bg-secondary)"; // single color for days with workouts
+  const primary = getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim() || '#10b981';
+  return count > 0 ? primary : "var(--bg-secondary)"; // single color for days with workouts
 };
 
 const scrollToDay = async (day: string) => {
@@ -185,8 +187,30 @@ onMounted(async () => { await store.fetchWorkouts(); });
 
 <template>
   <div class="workouts-list">
-    <div class="header-row">
-      <h1>Workout History (List)</h1>
+    <!-- Header Section -->
+    <div class="workouts-list-header">
+      <div class="header-content">
+        <div class="title-section">
+          <h1>Workouts (List)</h1>
+          <p class="subtitle">See your workouts in a detailed list format with contribution calendar.</p>
+        </div>
+
+        <div class="header-actions">
+          <!-- Settings Button -->
+          <button @click="$router.push('/settings')" class="settings-btn" title="Settings">
+            ⚙️
+          </button>
+          
+          <!-- User Badge -->
+          <div v-if="userAccount" class="user-badge">
+            <div class="user-avatar">{{ userAccount.username.charAt(0).toUpperCase() }}</div>
+            <div class="user-details">
+              <strong>{{ userAccount.username }}</strong>
+              <span>{{ userAccount.email }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Top Row -->
@@ -315,12 +339,140 @@ onMounted(async () => { await store.fetchWorkouts(); });
 <!-- ===============================================================================  -->
 
 <style scoped>
-  .workouts-list { padding: 2.5rem 3rem; width: 100%; min-height: 100vh; }
-  .header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
-  h1 { margin: 0; color: var(--text-primary); font-size: 2rem; font-weight: 600; letter-spacing: -0.5px; }
+  .workouts-list {
+    padding: 1.5rem 1.25rem;
+    width: 100%;
+    min-height: 100vh;
+    background: var(--bg-primary);
+  }
+
+  /* Header Styles */
+  .workouts-list-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+
+  .title-section h1 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, var(--color-primary, #10b981), var(--color-secondary, #06b6d4));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    margin: 0.5rem 0 0;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    font-weight: 400;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .settings-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    backdrop-filter: blur(8px);
+    color: var(--text-secondary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .settings-btn:hover {
+    border-color: var(--color-primary, #10b981);
+    color: var(--color-primary, #10b981);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px color-mix(in srgb, var(--color-primary, #10b981) 30%, transparent);
+  }
+
+  .user-badge {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--bg-card);
+    backdrop-filter: blur(8px);
+    padding: 0.75rem 1.25rem;
+    border-radius: 50px;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+  }
+
+  .user-badge:hover {
+    border-color: var(--color-primary, #10b981);
+    box-shadow: 0 4px 16px color-mix(in srgb, var(--color-primary, #10b981) 30%, transparent);
+    transform: translateY(-2px);
+  }
+
+  .user-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-primary, #10b981), var(--color-secondary, #06b6d4));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.125rem;
+    text-transform: uppercase;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  }
+
+  .user-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  .user-details strong {
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .user-details span {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+  }
+
   .filters { display: flex; align-items: center; gap: 0.75rem; }
   .filter-label { color: var(--text-secondary); font-size: 0.9rem; }
   .filter-select { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem 0.75rem; }
+  .filter-input { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem 0.75rem; width: 120px; }
+  
+  @media (max-width: 768px) {
+    .user-badge {
+      display: none;
+    }
+    
+    .settings-btn {
+      display: none;
+    }
+  }
 
   /* Contribution graph */
   .contrib-graph { margin-bottom: 1.5rem; }
@@ -337,13 +489,15 @@ onMounted(async () => { await store.fetchWorkouts(); });
 
 
   .loading-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem; gap: 1rem; }
-  .loading-spinner { width: 48px; height: 48px; border: 4px solid rgba(16,185,129,0.25); border-top-color: var(--emerald-primary); border-radius: 50%; animation: spin 0.9s linear infinite; }
+  .loading-spinner { width: 48px; height: 48px; border: 4px solid color-mix(in srgb, var(--color-primary, #10b981) 25%, transparent); border-top-color: var(--color-primary, #10b981); border-radius: 50%; animation: spin 0.9s linear infinite; }
   @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   .loading-container p { color: var(--text-secondary); font-size: 1.1rem; }
 
   .list { display: flex; flex-direction: column; gap: 0.75rem; }
-  .item { border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-card); overflow: hidden; }
-  .item-toggle { width: 100%; display: flex; align-items: center; justify-content: space-between; background: var(--bg-secondary); color: var(--text-primary); border: none; padding: 0.75rem 1rem; cursor: pointer; }
+  .item { border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-card); overflow: hidden; transition: all 0.3s ease; }
+  .item:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); border-color: var(--color-primary, #10b981); }
+  .item-toggle { width: 100%; display: flex; align-items: center; justify-content: space-between; background: var(--bg-secondary); color: var(--text-primary); border: none; padding: 0.75rem 1rem; cursor: pointer; transition: all 0.2s ease; }
+  .item-toggle:hover { background: rgba(30, 41, 59, 0.8); }
   .item .line { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem; }
   .line-date { color: var(--text-secondary); font-weight: 600; }
   .line-name { color: var(--text-primary); font-weight: 700; }
@@ -351,7 +505,7 @@ onMounted(async () => { await store.fetchWorkouts(); });
   .pill { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; border: 1px solid transparent; }
   .pill-red { background: rgba(239, 68, 68, 0.15); color: #ef4444; border-color: rgba(239, 68, 68, 0.35); }
   .pill-orange { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border-color: rgba(245, 158, 11, 0.35); }
-  .pill-green { background: rgba(16,185,129,0.15); color: var(--emerald-primary); border-color: rgba(16,185,129,0.35); }
+  .pill-green { background: color-mix(in srgb, var(--color-primary, #10b981) 15%, transparent); color: var(--color-primary, #10b981); border-color: color-mix(in srgb, var(--color-primary, #10b981) 35%, transparent); }
   .pill-blue { background: rgba(59,130,246,0.15); color: #3b82f6; border-color: rgba(59,130,246,0.35); }
   .pill-gold { background: rgba(201, 187, 0, 0.205); color: #eeea05; border-color: rgba(253, 228, 3, 0.35); }
   .toggle-icon { color: var(--text-secondary); margin-left: 0.5rem; }
@@ -367,11 +521,12 @@ onMounted(async () => { await store.fetchWorkouts(); });
   .stat span { color: var(--text-secondary); font-size: 0.8rem; }
 
   .exercises h3 { margin: 1rem 0 0.5rem; color: var(--text-primary); font-size: 1rem; }
-  .exercise { border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 0.5rem; overflow: hidden; }
+  .exercise { border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 0.5rem; overflow: hidden; background: rgba(0, 0, 0, 0.2); }
   .exercise-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
-  .exercise-header { display: flex; align-items: center; gap: 0.5rem; background: var(--bg-secondary); padding: 0.6rem 0.75rem; }
+  .exercise-header { display: flex; align-items: center; gap: 0.5rem; background: rgba(0, 0, 0, 0.3); padding: 0.6rem 0.75rem; transition: all 0.2s ease; }
+  .exercise-header:hover { background: rgba(0, 0, 0, 0.4); }
   .exercise-header .thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-color); }
-  .exercise-title { font-weight: 600; }
+  .exercise-title { font-weight: 600; font-size: 0.95rem; }
   .sets-table { width: 100%; border-collapse: collapse; }
   .sets-table th, .sets-table td { padding: 0.5rem; border-bottom: 1px solid var(--border-color); text-align: left; color: var(--text-primary); }
   .sets-table th { color: var(--text-secondary); font-weight: 500; }
@@ -404,6 +559,13 @@ onMounted(async () => { await store.fetchWorkouts(); });
     .stats { grid-template-columns: repeat(2, minmax(120px, 1fr)); }
     .exercise-grid { grid-template-columns: 1fr; }
     .exercise-header { flex-wrap: wrap; }
-    .sets-table { display: block; overflow-x: auto; }
+    .sets-table { display: block; overflow-x: auto; width: 100%; }
+    .sets-table table { min-width: 100%; width: 100%; }
   }
+
+@media (max-width: 480px) {
+  .title-section h1 {
+    font-size: 1.625rem;
+  }
+}
 </style>
