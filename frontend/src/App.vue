@@ -39,6 +39,7 @@ const scrollToTop = () => {
 
 const logout = () => {
   authService.logout();
+  store.logout();
   router.push("/login");
 };
 
