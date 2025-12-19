@@ -201,7 +201,7 @@ onMounted(async () => {
           <!--  Middle Row with Stats  -->
           <div class="stats-row">
             <div class="stat"><strong>{{ workout.estimated_volume_kg?.toLocaleString() || 0 }} kg</strong><span>{{ $t('global.volume') }}</span></div>
-            <div class="stat"><strong>{{ formatDuration(workout.start_time, workout.end_time) }}</strong><span>{{ $t('global.duaration') }}</span></div>
+            <div class="stat"><strong>{{ formatDuration(workout.start_time, workout.end_time) }}</strong><span>{{ $t('global.duration') }}</span></div>
             <div class="stat"><strong>{{ workout.exercises?.length || 0 }}</strong><span>{{ $t('global.exercises') }}</span></div>
             <div class="stat"><strong>{{ totalSets(workout) }}</strong><span>Total Sets</span></div>
           </div>

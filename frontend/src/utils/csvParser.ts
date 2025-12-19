@@ -218,7 +218,7 @@ function cleanString(val: string | undefined): string | null {
 // --- FILE UTILITIES ---
 
 export async function validateCSVFile(file: File): Promise<boolean> {
-  if (!file.name.endsWith(".csv")) throw new Error("File must be a CSV file");
+  if (!file.name.toLowerCase().endsWith(".csv")) throw new Error("File must be a CSV file");
   if (file.size > 10 * 1024 * 1024) throw new Error("File size must be less than 10MB");
   
   // Check if CSV contains weight_kg (not weight_lbs)

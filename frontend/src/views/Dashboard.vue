@@ -827,8 +827,8 @@ onMounted(() => {
         <div class="chart-container">
           <div class="chart-header">
             <div class="chart-title-section">
-              <h2>🔥 {{ $t('dashboard.charts.weeklyRythm') }}</h2>
-              <span class="chart-subtitle">{{ $t('dashboard.charts.weeklyRythmDescription') }}</span>
+              <h2>🔥 {{ $t('dashboard.charts.weeklyRhythm') }}</h2>
+              <span class="chart-subtitle">{{ $t('dashboard.charts.weeklyRhythmDescription') }}</span>
             </div>
           </div>
           <div class="chart-body radar-body">

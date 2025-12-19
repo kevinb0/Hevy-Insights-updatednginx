@@ -82,6 +82,8 @@ watch(selectedLanguage, (newLang) => {
 const resetSettings = () => {
   selectedTheme.value = "default";
   selectedLanguage.value = "en";
+  locale.value = "en";
+  localStorage.setItem("language", "en");
 };
 </script>
 

@@ -1,7 +1,7 @@
 /**
  * CSV Calculator Utility
  * 
- * * Logic Overview:
+ * Logic Overview:
  * 1. Aggregation: Sums up volume, reps, and sets across all workouts.
  * 2. Categorization: Maps exercise titles to muscle groups (Strict matching).
  * 3. Progression (PRs): Tracks 3 metrics: Estimated 1RM, Max Weight, and Max Reps.

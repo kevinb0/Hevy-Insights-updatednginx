@@ -73,10 +73,14 @@ const handleCSVUpload = async () => {
   // Try to "login" with CSV file
   try {
     // Validate file
-    const isValid = await validateCSVFile(csvFile.value);
-    if (!isValid) {
-      csvError.value = t("login.csv.errors.invalidFile");
-      uploadLoading.value = false;
+    try {
+      const isValid = await validateCSVFile(csvFile.value);
+      if (!isValid) {
+        csvError.value = t("login.csv.errors.invalidFile");
+        return;
+      }
+    } catch (err: any) {
+      csvError.value = err?.message || t("login.csv.errors.invalidFile");
       return;
     }
 

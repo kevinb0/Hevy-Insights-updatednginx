@@ -18,7 +18,7 @@ Thanks for your potential interest in contributing to Hevy Insights! There are s
 
 If you want to improve current translations or add new languages, you can do so by editing the JSON files located in the `frontend/src/locales/` directory.
 
-To add a new english, copy the default `en.json` file and rename it to the desired [ISO-639-1 language code](https://en.wikipedia.org/wiki/ISO_639-1) (e.g., `pt.json` for Portuguese). Then, translate the strings accordingly.
+To add a new language, copy the default `en.json` file and rename it to the desired [ISO-639-1 language code](https://en.wikipedia.org/wiki/ISO_639-1) (e.g., `pt.json` for Portuguese). Then, translate the strings accordingly.
 
 > [!WARNING]
 > You must be able to read the original strings in English to provide accurate translations.

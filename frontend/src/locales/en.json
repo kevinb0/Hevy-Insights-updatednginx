@@ -64,8 +64,8 @@
       "repsAndSetsDescription": "Training volume breakdown",
       "PRsOverTime": "PRs Over Time",
       "PRsOverTimeDescription": "Personal records achieved",
-      "weeklyRythm": "Weekly Rhythm",
-      "weeklyRythmDescription": "Training frequency by day",
+      "weeklyRhythm": "Weekly Rhythm",
+      "weeklyRhythmDescription": "Training frequency by day",
       "muscleDistribution": "Muscle Distribution",
       "muscleDistributionDescription": "Sets by muscle group"
     }
@@ -137,7 +137,7 @@
     "loadingSpinnerText": "Loading your workout data...",
     "volume": "Volume",
     "hours": "Hours",
-    "duaration": "Duration",
+    "duration": "Duration",
     "exercises": "Exercises",
     "weight": "Weight",
     "notes": "Notes",
