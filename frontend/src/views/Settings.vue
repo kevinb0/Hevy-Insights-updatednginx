@@ -6,6 +6,7 @@ import { useHevyCache } from "../stores/hevy_cache";
 const store = useHevyCache();
 const { locale, t } = useI18n();
 const userAccount = computed(() => store.userAccount);
+const dataSource = computed(() => store.dataSource);
 
 // Color theme presets
 const colorThemes = [
@@ -62,9 +63,25 @@ onMounted(() => {
   applyTheme(selectedTheme.value);
 });
 
+// Language settings
+const languages = [
+  { code: "en", name: "English", flag: "🇬🇧" },
+  { code: "de", name: "Deutsch", flag: "🇩🇪" },
+  { code: "es", name: "Español", flag: "🇪🇸" },
+];
+
+const selectedLanguage = ref<string>(localStorage.getItem("language") || "en");
+
+// Watch for language changes
+watch(selectedLanguage, (newLang) => {
+  locale.value = newLang;
+  localStorage.setItem("language", newLang);
+});
+
 // Reset to default
 const resetSettings = () => {
   selectedTheme.value = "default";
+  selectedLanguage.value = "en";
 };
 </script>
 
@@ -122,14 +139,44 @@ const resetSettings = () => {
         </div>
       </div>
 
-      <!-- More Settings Sections (Future) -->
+      <!-- Language Section -->
       <div class="settings-section">
         <div class="section-header">
-          <h2>📊 Language</h2>
-          <p class="section-description">Coming soon: Choose different languages for the interface</p>
+          <h2>🌐 {{ t('settings.language.title') }}</h2>
+          <p class="section-description">{{ t('settings.language.description') }}</p>
         </div>
-        <div class="coming-soon">
-          <span class="coming-soon-badge">🚧 Under Construction</span>
+
+        <div class="language-grid">
+          <div
+            v-for="lang in languages"
+            :key="lang.code"
+            @click="selectedLanguage = lang.code"
+            :class="['language-card', { active: selectedLanguage === lang.code }]"
+          >
+            <span class="language-flag">{{ lang.flag }}</span>
+            <div class="language-name">{{ lang.name }}</div>
+            <div v-if="selectedLanguage === lang.code" class="language-check">✓</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Management Section -->
+      <div class="settings-section">
+        <div class="section-header">
+          <h2>💾 {{ t('settings.dataManagement.title') }}</h2>
+          <p class="section-description">{{ t('settings.dataManagement.description') }}</p>
+        </div>
+
+        <div class="data-info-card">
+          <div class="data-info-row">
+            <span class="data-label">{{ t('settings.dataManagement.dataSource') }}</span>
+            <span class="data-value" :class="dataSource">
+              {{ dataSource === "csv" ? "CSV Upload" : "Hevy API" }}
+            </span>
+          </div>
+          <p v-if="dataSource === 'csv'" class="data-note">
+            {{ t('settings.dataManagement.csvNote') }}
+          </p>
         </div>
       </div>
 
@@ -392,24 +439,116 @@ const resetSettings = () => {
   box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primary, #10b981) 40%, transparent);
 }
 
-/* Coming Soon */
-.coming-soon {
-  padding: 3rem 2rem;
-  text-align: center;
-  border: 2px dashed rgba(51, 65, 85, 0.5);
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.2);
+/* Language Grid */
+.language-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
 }
 
-.coming-soon-badge {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  background: rgba(245, 158, 11, 0.1);
-  border: 1px solid rgba(245, 158, 11, 0.3);
-  border-radius: 50px;
-  color: #fbbf24;
-  font-size: 0.9rem;
+.language-card {
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(51, 65, 85, 0.5);
+  border-radius: 12px;
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.language-card:hover {
+  border-color: color-mix(in srgb, var(--color-primary, #10b981) 50%, transparent);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.language-card.active {
+  border-color: var(--color-primary, #10b981);
+  background: color-mix(in srgb, var(--color-primary, #10b981) 10%, transparent);
+  box-shadow: 0 0 0 1px var(--color-primary, #10b981) inset;
+}
+
+.language-flag {
+  font-size: 2rem;
+}
+
+.language-name {
+  color: #f8fafc;
+  font-size: 1rem;
   font-weight: 600;
+  flex: 1;
+}
+
+.language-check {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-primary, #10b981);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.875rem;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primary, #10b981) 40%, transparent);
+}
+
+/* Data Management */
+.data-info-card {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.data-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+}
+
+.data-label {
+  color: #94a3b8;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.data-value {
+  color: #f8fafc;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  background: rgba(51, 65, 85, 0.5);
+  border-radius: 8px;
+  border: 1px solid rgba(51, 65, 85, 0.7);
+}
+
+.data-value.csv {
+  background: rgba(6, 182, 212, 0.1);
+  border-color: rgba(6, 182, 212, 0.3);
+  color: #06b6d4;
+}
+
+.data-value.api {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #10b981;
+}
+
+.data-note {
+  margin: 1rem 0 0;
+  padding: 1rem;
+  background: rgba(6, 182, 212, 0.05);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-left: 4px solid #06b6d4;
+  border-radius: 8px;
+  color: #9dd7e5;
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 
 /* Actions */
@@ -471,6 +610,16 @@ const resetSettings = () => {
 
   .theme-grid {
     grid-template-columns: 1fr;
+  }
+
+  .language-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .data-info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
   }
 
   .settings-actions {
