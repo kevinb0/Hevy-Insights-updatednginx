@@ -81,9 +81,35 @@
     "subtitle": "Análisis detallado y seguimiento de progreso para cada ejercicio.",
     "searchFilter": "Buscar ejercicios por nombre...",
     "personalRecords": "Récords Personales",
+    "neverTrained": "Nunca entrenado",
+    "summary": {
+      "total": "Total",
+      "active": "Activo"
+    },
+    "lastTrained": {
+      "today": "Entrenado hoy",
+      "yesterday": "Entrenado ayer",
+      "daysAgo": "Entrenado hace {days} días",
+      "weeksAgo": "Entrenado hace {weeks} semana(s)",
+      "monthsAgo": "Entrenado hace {months} mes(es)"
+    },
     "stats": {
       "statsHeader": "Estadísticas",
       "totalSessions": "Sesiones Totales"
+    },
+    "insights": {
+      "plateauBadge": "Meseta",
+      "gainingBadge": "Progreso",
+      "losingBadge": "Declive",
+      "insufficientBadge": "Nuevo",
+      "inactiveBadge": "Inactivo",
+      "maintainingBadge": "Manteniendo",
+      "plateau": "Tu serie máxima se ha mantenido alrededor de {weight}kg por {repsMin}-{repsMax} reps. ¡Intenta agregar más peso o reps!",
+      "gaining": "¡Has aumentado {weightChange}kg o {repsChange} reps en tus últimas sesiones!",
+      "losing": "Rendimiento disminuyó {weightChange}kg o {repsChange} reps. Considera descanso o revisar técnica.",
+      "insufficient": "Datos insuficientes aún. Se necesitan al menos {needed} sesiones, actualmente tienes {sessions}.",
+      "inactive": "No entrenado en {days} días. ¡Reanuda el entrenamiento para seguir tu progreso!",
+      "maintaining": "Rendimiento estable. Estás manteniendo tu nivel de fuerza actual."
     },
     "graphs": {
       "maxWeight": "Peso Máx. (A lo Largo del Tiempo)",

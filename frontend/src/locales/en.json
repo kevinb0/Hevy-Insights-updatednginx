@@ -81,9 +81,35 @@
     "subtitle": "Detailed analysis and progress tracking for each exercise.",
     "searchFilter": "Search exercises by name...",
     "personalRecords": "Personal Records",
+    "neverTrained": "Never trained",
+    "summary": {
+      "total": "Total",
+      "active": "Active"
+    },
+    "lastTrained": {
+      "today": "Last trained today",
+      "yesterday": "Last trained yesterday",
+      "daysAgo": "Last trained {days} days ago",
+      "weeksAgo": "Last trained {weeks} week(s) ago",
+      "monthsAgo": "Last trained {months} month(s) ago"
+    },
     "stats": {
       "statsHeader": "Stats",
       "totalSessions": "Total Sessions"
+    },
+    "insights": {
+      "plateauBadge": "Plateau",
+      "gainingBadge": "Gaining",
+      "losingBadge": "Declining",
+      "insufficientBadge": "New",
+      "inactiveBadge": "Inactive",
+      "maintainingBadge": "Maintaining",
+      "plateau": "Your top set has hovered around {weight}kg for {repsMin}-{repsMax} reps. Try adding more weight or reps to break the plateau!",
+      "gaining": "You've increased by {weightChange}kg or {repsChange} reps over your last sessions!",
+      "losing": "Performance decreased by {weightChange}kg or {repsChange} reps. Consider rest or form check.",
+      "insufficient": "Not enough data yet. Need at least {needed} sessions, currently have {sessions}.",
+      "inactive": "Not trained in {days} days. Resume training to track progress!",
+      "maintaining": "Performance is stable. You're maintaining your current strength level."
     },
     "graphs": {
       "maxWeight": "Max Weight (Over Time)",

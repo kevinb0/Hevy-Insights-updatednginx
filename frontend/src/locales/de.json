@@ -81,9 +81,35 @@
     "subtitle": "Detaillierte Analyse und Fortschrittsverfolgung für jede Übung.",
     "searchFilter": "Übungen nach Name suchen...",
     "personalRecords": "Persönliche Rekorde",
+    "neverTrained": "Nie trainiert",
+    "summary": {
+      "total": "Gesamt",
+      "active": "Aktiv"
+    },
+    "lastTrained": {
+      "today": "Heute trainiert",
+      "yesterday": "Gestern trainiert",
+      "daysAgo": "Vor {days} Tagen trainiert",
+      "weeksAgo": "Vor {weeks} Woche(n) trainiert",
+      "monthsAgo": "Vor {months} Monat(en) trainiert"
+    },
     "stats": {
       "statsHeader": "Statistiken",
       "totalSessions": "Gesamte Trainingseinheiten"
+    },
+    "insights": {
+      "plateauBadge": "Plateau",
+      "gainingBadge": "Fortschritt",
+      "losingBadge": "Rückgang",
+      "insufficientBadge": "Neu",
+      "inactiveBadge": "Inaktiv",
+      "maintainingBadge": "Stabil",
+      "plateau": "Ihr bester Satz liegt bei etwa {weight}kg für {repsMin}-{repsMax} Wdh. Versuchen Sie, mehr Gewicht oder Wiederholungen hinzuzufügen!",
+      "gaining": "Sie haben um {weightChange}kg oder {repsChange} Wdh. in den letzten Einheiten zugelegt!",
+      "losing": "Leistung sank um {weightChange}kg oder {repsChange} Wdh. Erwägen Sie Erholung oder Formüberprüfung.",
+      "insufficient": "Noch nicht genug Daten. Benötigt mindestens {needed} Einheiten, aktuell {sessions}.",
+      "inactive": "Seit {days} Tagen nicht trainiert. Nehmen Sie das Training wieder auf!",
+      "maintaining": "Leistung ist stabil. Sie halten Ihr aktuelles Kraftniveau."
     },
     "graphs": {
       "maxWeight": "Max. Gewicht (im Zeitverlauf)",
