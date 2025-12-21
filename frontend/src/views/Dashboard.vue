@@ -1744,6 +1744,12 @@ onMounted(() => {
     justify-content: flex-end;
   }
   
+  /* Make filter buttons smaller to fit mo/wk on same line */
+  .filter-btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+  }
+  
   .chart-body {
     padding: 0.75rem 0.5rem;
     min-height: 260px;
