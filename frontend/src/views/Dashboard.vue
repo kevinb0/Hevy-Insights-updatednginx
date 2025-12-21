@@ -510,10 +510,16 @@ const recentPRs = computed(() => {
 });
 
 // Navigate to Exercises page and scroll to specific exercise
-const navigateToExercise = (exerciseId: string) => {
+const navigateToExercise = (localizedTitle: string) => {
+  // Generate ID from localized title (same logic as Exercises.vue)
+  const id = String(localizedTitle)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  
   router.push({
     name: "Exercises",
-    hash: `#${exerciseId}`
+    hash: `#${id}`
   });
 };
 
