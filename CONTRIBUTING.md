@@ -16,12 +16,49 @@ Thanks for your potential interest in contributing to Hevy Insights! There are s
 
 ## Translations
 
-If you want to improve current translations or add new languages, you can do so by editing the JSON files located in the `frontend/src/locales/` directory.
+To add a new language to Hevy Insights, follow these steps:
 
-To add a new language, copy the default `en.json` file and rename it to the desired [ISO-639-1 language code](https://en.wikipedia.org/wiki/ISO_639-1) (e.g., `pt.json` for Portuguese). Then, translate the strings accordingly.
+1. **Create Language File**
 
-> [!WARNING]
-> You must be able to read the original strings in English to provide accurate translations.
+   - Add a new JSON file in `frontend/src/locales/` (e.g., `fr.json` for French). Filename must be in [ISO-639-1 language code](https://en.wikipedia.org/wiki/ISO_639-1) format.
+   - Copy the structure from `en.json` and translate all strings
+   - Follow the nested structure: `dashboard`, `exercises`, `workouts`, `...`.
+
+   > [!WARNING]
+   > You must be able to read the original strings in English to provide accurate translations.
+
+2. **Register Language in Index**
+   - Open `frontend/src/locales/index.ts`
+   - Import your language file: `import fr from './fr.json';`
+   - Add it to the messages object: `messages: { en, de, es, fr }`
+
+3. **Update Settings Component**
+   - Open `frontend/src/views/Settings.vue`
+   - Add your language to the language selector dropdown
+   - Include the flag emoji and native language name
+
+4. **Handle Exercise Localization**
+   - Hevy API provides localized exercise titles (e.g. `de_title` and `es_title`)
+   - For new languages, add a corresponding field pattern (e.g. `fr_title`)
+   - Update these files to check for the new field:
+     - `frontend/src/views/Dashboard.vue` - plateauExercises computed property
+     - `frontend/src/views/Exercises.vue` - getLocalizedTitle() function
+   - The pattern matches the language code: if locale is "fr", check for `fr_title`
+
+5. **Test Thoroughly**
+   - Verify all UI strings are translated
+   - Check that exercise names display correctly
+   - Test language switching in Settings
+   - Confirm plateau navigation works with localized exercise names
+
+**Example for French:**
+
+```typescript
+// In getLocalizedTitle() or plateauExercises:
+if (locale === "fr" && exercise.fr_title) {
+  localizedTitle = exercise.fr_title;
+}
+```
 
 Once you're done commit your changes and create a pull request.
 
