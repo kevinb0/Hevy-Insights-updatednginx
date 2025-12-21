@@ -73,6 +73,23 @@ const allWorkouts = computed(() => store.workouts || []);
 
 onMounted(async () => {
   await store.fetchWorkouts();
+  
+  // Check if there's an exercise ID in the URL hash
+  if (window.location.hash) {
+    const exerciseId = window.location.hash.substring(1); // Remove # prefix
+    // Wait for exercises to be computed
+    setTimeout(() => {
+      // Expand the exercise
+      expanded.value[exerciseId] = true;
+      // Scroll to the exercise
+      const element = document.getElementById(exerciseId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }, 300);
+  }
+});
+
 // Helper function to get localized exercise title
 function getLocalizedTitle(exercise: any): string {
   const locale = localStorage.getItem("language") || "en";
