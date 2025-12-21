@@ -1194,7 +1194,7 @@ onMounted(() => {
         <div class="section-header" @click="toggleSection('calendarViews')">
           <div class="section-title">
             <span class="section-icon">📅</span>
-            <h2>{{ $t("dashboard.sections.calendarViews") }}</h2>
+            <h2>{{$t("dashboard.sections.calendarViews")}}</h2>
           </div>
           <div class="section-toggle">
             <span class="toggle-icon">{{ expandedSections.calendarViews ? '▼' : '▶' }}</span>
@@ -1207,8 +1207,8 @@ onMounted(() => {
               <div class="chart-container">
                 <div class="chart-header">
                   <div class="chart-title-section">
-                    <h3>🔥 {{ $t('dashboard.charts.weeklyRhythm') }}</h3>
-                    <span class="chart-subtitle">{{ $t('dashboard.charts.weeklyRhythmDescription') }}</span>
+                    <h3>🔥 {{$t('dashboard.charts.weeklyRhythm')}}</h3>
+                    <span class="chart-subtitle">{{$t('dashboard.charts.weeklyRhythmDescription')}}</span>
                   </div>
                 </div>
                 <div class="chart-body radar-body">
@@ -1242,7 +1242,7 @@ onMounted(() => {
         <div class="section-header" @click="toggleSection('muscleDistribution')">
           <div class="section-title">
             <span class="section-icon">💪</span>
-            <h2>{{ $t("dashboard.sections.muscleDistribution") }}</h2>
+            <h2>{{$t("dashboard.sections.muscleDistribution")}}</h2>
           </div>
           <div class="section-toggle">
             <span class="toggle-icon">{{ expandedSections.muscleDistribution ? '▼' : '▶' }}</span>
@@ -1255,8 +1255,8 @@ onMounted(() => {
               <div class="chart-container">
                 <div class="chart-header">
                   <div class="chart-title-section">
-                    <h3>🎯 {{ $t('dashboard.charts.muscleDistribution') }}</h3>
-                    <span class="chart-subtitle">{{ $t('dashboard.charts.muscleDistributionDescription') }}</span>
+                    <h3>🎯 {{$t('dashboard.charts.muscleDistribution')}}</h3>
+                    <span class="chart-subtitle">{{$t('dashboard.charts.muscleDistributionDescription')}}</span>
                   </div>
                   <div class="chart-filters">
                     <div class="filter-group">
