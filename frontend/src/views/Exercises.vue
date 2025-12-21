@@ -73,7 +73,19 @@ const allWorkouts = computed(() => store.workouts || []);
 
 onMounted(async () => {
   await store.fetchWorkouts();
-});
+// Helper function to get localized exercise title
+function getLocalizedTitle(exercise: any): string {
+  const locale = localStorage.getItem("language") || "en";
+  
+  // Select localized title if available
+  if (locale === "de" && exercise.de_title) {
+    return exercise.de_title;
+  } else if (locale === "es" && exercise.es_title) {
+    return exercise.es_title;
+  }
+  
+  return exercise.title || "Unknown Exercise";
+}
 
 // Analyze strength progress based on last 5 sessions
 function analyzeStrengthProgress(ex: any) {
@@ -203,8 +215,8 @@ const exercises = computed(() => {
     const dayKey = date.toISOString().slice(0,10);
     
     for (const ex of (w.exercises || [])) {
-      // Key by exercise title to aggregate across all workouts
-      const title = ex.title || "Unknown Exercise";
+      // Use localized title based on user's language preference
+      const title = getLocalizedTitle(ex);
       const id = String(title)
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
@@ -649,7 +661,7 @@ const barChartOptions = {
     </div>
 
     <div v-else class="exercise-list">
-      <div v-for="ex in filteredExercises" :key="ex.id" class="exercise-card">
+      <div v-for="ex in filteredExercises" :key="ex.id" :id="ex.id" class="exercise-card">
         <!-- Card Header / Toggle -->
         <button class="card-toggle" @click="expanded[ex.id] = !expanded[ex.id]">
           <div class="toggle-left">
