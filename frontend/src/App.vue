@@ -9,7 +9,7 @@ const route = useRoute();
 const store = useHevyCache();
 const userAccount = computed(() => store.userAccount);
 const showNav = ref(false);
-const appVersion = "v1.3.0"; // Update version as needed
+const appVersion = "v1.4.0"; // Update version as needed
 const isMobileSidebarOpen = ref(false);
 const showTopbar = ref(true);
 const showScrollTop = ref(false);
@@ -92,7 +92,7 @@ watch(isMobileSidebarOpen, (open) => {
     <header v-if="showNav && showTopbar" class="topbar">
       <button class="menu-btn" @click="isMobileSidebarOpen = !isMobileSidebarOpen">☰</button>
       <router-link to="/dashboard" class="topbar-brand">
-        <span class="brand-text">Hevy Insights <span v-if="userAccount" class="brand-username">{{ $t('nav.brandTextFor') }} {{ userAccount.username }}</span></span>
+        <span class="brand-text">Hevy Insights <span v-if="userAccount" class="brand-username">{{ $t('nav.brandTextFor') }} TESTUSER</span></span>
       </router-link>
     </header>
     
