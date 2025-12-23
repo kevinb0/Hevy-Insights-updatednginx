@@ -329,8 +329,38 @@ body.sidebar-open {
     padding-right: 0.5rem;
   }
 
+  /* Hide the full brand (icon + text) when collapsed; keep only the collapse-toggle visible */
+  .sidebar.collapsed .sidebar-brand {
+    display: none;
+  }
+
   .sidebar.collapsed .nav-item::before {
     display: none;
+  }
+
+  /* Make collapsed nav items uniform */
+  .sidebar.collapsed .nav-item {
+    padding: 0.25rem 0;
+    margin: 0.25rem auto; /* center horizontally inside sidebar */
+    width: 75%;
+    justify-content: center;
+    gap: 0;
+  }
+
+  .sidebar.collapsed .nav-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 1.05rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+  }
+
+  /* Reduce header padding when collapsed to prevent overlap */
+  .sidebar.collapsed .sidebar-header {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
   }
 }
 
@@ -342,6 +372,7 @@ body.sidebar-open {
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
+  position: relative;
 }
 
 .collapse-toggle {
@@ -356,6 +387,8 @@ body.sidebar-open {
   cursor: pointer;
   transition: all 0.3s ease;
   flex-shrink: 0;
+  position: relative;
+  z-index: 2;
 }
 
 .collapse-toggle:hover {
@@ -370,6 +403,28 @@ body.sidebar-open {
     align-items: center;
     justify-content: center;
   }
+    /* When collapsed, center the collapse toggle and make it stand out */
+    .sidebar.collapsed .sidebar-header {
+      justify-content: center;
+    }
+
+    .sidebar.collapsed .collapse-toggle {
+      margin: 0; /* center by header's justify-content */
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      font-size: 0.95rem;
+    }
+
+    /* Remove leftover space from hidden nav-text for perfect centering */
+    .sidebar.collapsed .nav-text {
+      display: none;
+    }
+
+    .sidebar.collapsed .logout-btn {
+      justify-content: center;
+      padding: 0.25rem 0;
+    }
 }
 
 .sidebar-brand {
