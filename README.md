@@ -158,7 +158,6 @@ Clone/download the repository and follow these steps:
 - Display time on Workout cards like "1h 15m" instead of "75 minutes"
 - Better logging
 - Replace localStorage with HTTP cookie
-- Exercise videos not showing up on mobile
 - Handle exercises with time (planks, jogging)
 - On page switch, start at the top and not on the height where the user previously left the other page
 
