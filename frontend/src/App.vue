@@ -92,7 +92,7 @@ watch(isMobileSidebarOpen, (open) => {
     <header v-if="showNav && showTopbar" class="topbar">
       <button class="menu-btn" @click="isMobileSidebarOpen = !isMobileSidebarOpen">☰</button>
       <router-link to="/dashboard" class="topbar-brand">
-        <span class="brand-text">Hevy Insights <span v-if="userAccount" class="brand-username">{{ $t('nav.brandTextFor') }} TESTUSER</span></span>
+        <span class="brand-text">Hevy Insights <span v-if="userAccount" class="brand-username">{{ $t('nav.brandTextFor') }} {{ userAccount.username }}</span></span>
       </router-link>
     </header>
     
