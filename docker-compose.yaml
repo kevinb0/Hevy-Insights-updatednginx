@@ -5,7 +5,7 @@ networks:
 services:
   backend:
     container_name: hevy_backend
-    image: casudo/hevy-insights-backend:latest
+    image: YOUR_BUILT_DOCKER_IMAGE_HERE
     restart: unless-stopped
     # ports: # Optional external exposure
     #  - 5000:5000
@@ -22,7 +22,7 @@ services:
 
   frontend:
     container_name: hevy_frontend
-    image: casudo/hevy-insights-frontend:latest
+    image: YOUR_BUILT_DOCKER_IMAGE_HERE
     restart: unless-stopped
     ports:
       - 8123:8080
