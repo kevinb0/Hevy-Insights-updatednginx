@@ -27,6 +27,7 @@ Hevy Insights allows you to log in with your Hevy credentials and fetch your wor
 - [Usage](#usage)
   - [Hosted Online](#hosted-online)
   - [Local Setup](#local-setup)
+  - [Docker](#docker)
 - [Future Goals](#future-goals)
 - [Technical Documentation](#technical-documentation)
   - [Project Structure](#project-structure)
@@ -67,7 +68,7 @@ Hevy Insights allows you to log in with your Hevy credentials and fetch your wor
 
 # Usage
 
-You can either use Hevy Insights online or run it locally on your machine.
+You can either use Hevy Insights online or run it locally on your machine via multiple methods.
 
 ## Hosted Online
 
@@ -97,6 +98,21 @@ Clone/download the repository and follow these steps:
 5. **Open your browser** and navigate to `http://localhost:5173`
 
 6. **Login** with your Hevy username/email and password
+
+## Docker
+
+1. Build the Docker images:
+
+  `docker build -f backend/Dockerfile_backend -t casudo/hevy-insights-backend:latest .`
+
+  `docker build -f frontend/Dockerfile_frontend -t casudo/hevy-insights-frontend:latest .`
+
+1. Run the containers:
+
+  `docker-compose up -d`
+
+  > [!NOTE]
+  > You can find the [docker-compose.yaml](./docker-compose.yaml) file in the repository root folder.
 
 ---
 
