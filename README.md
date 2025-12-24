@@ -160,6 +160,9 @@ Clone/download the repository and follow these steps:
 - Replace localStorage with HTTP cookie
 - Handle exercises with time (planks, jogging)
 - On page switch, start at the top and not on the height where the user previously left the other page
+- CSV upload: PRs not shown and muscle regions missing
+- Mobile: Shrink login mode buttons
+- Mobile: After logging in, the website appears to be zoomed in
 
 ---
 
